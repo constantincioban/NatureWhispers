@@ -1,6 +1,7 @@
 # NatureWhispers
 
-The Meditation App is an Android application designed to help you meditate with soothing nature sounds and track your progress. Built using Kotlin with modern Android development practices, the app offers a clean, intuitive interface and powerful features.
+NatureWhispers is an Android application designed to help users focus on meditation with nature sounds and achieve consistency by setting personal goals.<br>
+Built with Kotlin and Jetpack Compose for the UI, NatureWhispers follows the MVVM and MVI architectural patterns for a robust and maintainable codebase.
 
 ## 🛠 Features
 
