@@ -1,5 +1,18 @@
 # NatureWhispers
 
+<p float="left">
+ <img class="img" width="200" src="https://github.com/user-attachments/assets/471bc3ff-1023-4afc-ba21-bb4eae673c3a" />
+ <img class="img" width="200" src="https://github.com/user-attachments/assets/e06d0735-0b16-4391-acd8-6c2fd4367362" />
+ <img class="img" width="200" src="https://github.com/user-attachments/assets/1b61e237-24c3-457b-a1dc-0377a62960f8" /> 
+</p>
+
+<p float="left">
+ <img class="img" width="200" src="https://github.com/user-attachments/assets/06a9b060-5a17-4dbd-8598-ccbeb389cc26" />
+ <img class="img" width="200" src="https://github.com/user-attachments/assets/39f6fa04-c7ba-4a17-b318-25b6da680134" />
+ <img class="img" width="200" src="https://github.com/user-attachments/assets/238a4722-2e24-4900-9f97-aec8f004a6f7" />
+ <img class="img" width="200" src="https://github.com/user-attachments/assets/03299ce3-283f-4258-919d-239c2900616b" />
+<p>
+  
 NatureWhispers is an Android application designed to help users focus on meditation with nature sounds and achieve consistency by setting personal goals.<br>
 Built with Kotlin and Jetpack Compose for the UI, NatureWhispers follows the MVVM and MVI architectural patterns for a robust and maintainable codebase.
 
