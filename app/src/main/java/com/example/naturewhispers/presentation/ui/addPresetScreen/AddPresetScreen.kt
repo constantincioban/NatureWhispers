@@ -55,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.naturewhispers.data.utils.formatSecondsToMMss
 import com.example.naturewhispers.data.utils.getDisplayNameFromUri
 import com.example.naturewhispers.data.utils.observeWithLifecycle
+import com.example.naturewhispers.navigation.Screens
 import com.example.naturewhispers.presentation.redux.ContentType
 import com.example.naturewhispers.presentation.ui.PlayerEvents
 import com.example.naturewhispers.presentation.ui.PlayerState
@@ -68,7 +69,7 @@ import com.example.naturewhispers.presentation.ui.theme.NatureWhispersTheme
 @Composable
 fun AddPresetScreen(
     presetId: Int,
-    navigateToMain: () -> Unit,
+    navigateTo: (route: String, params: List<Any>) -> Unit,
     viewModel: AddPresetViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState,
     sharedViewModel: SharedViewModel,
@@ -84,7 +85,7 @@ fun AddPresetScreen(
         Content(
             viewModel.uiState.value,
             viewModel::sendEvent,
-            navigateToMain,
+            navigateTo,
             sharedViewModel::dispatchEvent,
             sharedViewModel.state.value,
         )
@@ -97,14 +98,14 @@ fun AddPresetScreen(
 fun Content(
     uiState: AddPresetState,
     sendEvent: (AddPresetEvents) -> Unit,
-    navigateToMain: () -> Unit,
+    navigateTo: (route: String, params: List<Any>) -> Unit,
     sendPlayerEvent: (PlayerEvents) -> Unit,
     playerState: PlayerState,
 
     ) {
 
     val sendEventStable: (AddPresetEvents) -> Unit = remember { sendEvent }
-    val navigateToMainStable: () -> Unit = remember { navigateToMain }
+    val navigateToStable: (route: String, params: List<Any>) -> Unit = remember { navigateTo }
     val sendPlayerEventStable: (PlayerEvents) -> Unit = remember { sendPlayerEvent }
 
     val presetId by remember(uiState.presetId) {
@@ -113,7 +114,7 @@ fun Content(
 
     LaunchedEffect(key1 = uiState.presetAddedSuccessfully) {
         if (uiState.presetAddedSuccessfully)
-            navigateToMainStable()
+            navigateTo(Screens.Main.route, listOf())
     }
 
     val context = LocalContext.current as Activity
@@ -133,7 +134,7 @@ fun Content(
         SoundsListDialogContent(sendEventStable, sendPlayerEventStable, state = uiState, playerState)
 
     if (uiState.showDeleteDialog)
-        DeleteDialog(sendEvent = sendEventStable, state = uiState, navigateToMain = navigateToMainStable)
+        DeleteDialog(sendEvent = sendEventStable, state = uiState, navigateTo = navigateToStable)
 
     Column(
         modifier = Modifier
@@ -147,7 +148,7 @@ fun Content(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RoundedIcon(icon = Icons.Rounded.ArrowBackIosNew, onClick = {navigateToMainStable()})
+            RoundedIcon(icon = Icons.Rounded.ArrowBackIosNew, onClick = {navigateTo(Screens.Main.route, listOf())})
             Text(text = "Add Preset", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             RoundedIcon(
                 icon = Icons.Rounded.DeleteForever,
@@ -303,7 +304,7 @@ fun PresetScreenPreview() {
         Content(
             uiState = AddPresetState(),
             sendEvent = {},
-            navigateToMain = {},
+            navigateTo = { _, _ -> },
             sendPlayerEvent = {},
             playerState = PlayerState(),
         )

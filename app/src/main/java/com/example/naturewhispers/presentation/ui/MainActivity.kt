@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Debug
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.util.Log
@@ -29,8 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -54,8 +57,10 @@ import com.example.naturewhispers.presentation.ui.theme.NatureWhispersTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -64,6 +69,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var store: Store<AppState>
     private val sharedViewModel: SharedViewModel by viewModels()
+
 
     @SuppressLint("WrongConstant")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -78,6 +84,8 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        val traceFile = File(getExternalFilesDir(null), "tracefile.trace")
+//        Debug.startMethodTracing(traceFile.absolutePath)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 
             ActivityCompat.requestPermissions(
@@ -85,17 +93,20 @@ class MainActivity : ComponentActivity() {
                 0
             )
         }
-
-        launchIsPlayingObserver()
         enableEdgeToEdge()
         setContent {
-            val isSystemInDarkTheme = isSystemInDarkTheme()
-            val darkTheme = store.state.map { it.darkTheme }.collectAsState(initial = isSystemInDarkTheme)
-            NWCustomTheme(darkTheme = darkTheme.value == "true") {
+            val darkTheme = store.state.map { it.darkTheme }.filterNot { it.isEmpty() }
+                .collectAsState(initial = isSystemInDarkTheme().toString())
+            NWCustomTheme(darkTheme = darkTheme.value == true.toString()) {
                 val navController = rememberNavController()
                 val snackbarHostState = remember { SnackbarHostState() }
                 val actions = remember(navController) { Actions(navController) }
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
 
+                val currentRoute by remember {
+                    mutableStateOf(navBackStackEntry?.destination?.route )
+                }
+                Log.i(TAG, "onCreate: currentRoute = $currentRoute")
                 val navigationBarColor = MaterialTheme.colorScheme.surfaceVariant
                 val backgroundColor = MaterialTheme.colorScheme.background
                 Surface(
@@ -103,17 +114,14 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Scaffold(
                         bottomBar = {
-                            if (currentRoute(navController = navController) == null ||
-                                (currentRoute(navController = navController) != Screens.AddPreset.routeWithArgs &&
-                                        currentRoute(navController = navController) != Screens.Auth.route)
-                            ) {
-                                BottomBar(navController = navController, store = store)
-                                window.navigationBarColor = navigationBarColor.toArgb()
-                            } else if (currentRoute(navController = navController) == Screens.AddPreset.routeWithArgs) {
+                            if (currentRoute != null && currentRoute == Screens.AddPreset.route)
                                 window.navigationBarColor = backgroundColor.toArgb()
-                            } else if (currentRoute(navController = navController) == Screens.Auth.route)
-                                window.navigationBarColor = Color.Transparent.toArgb()
-
+                            else {
+                                BottomBar(navigateTo = { route, _ ->
+                                    actions.navigateTo(route, listOf())
+                                })
+                                window.navigationBarColor = navigationBarColor.toArgb()
+                            }
                         },
                         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
 
@@ -123,7 +131,6 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             snackbarHostState = snackbarHostState,
                             actions = actions,
-                            store = store,
                             sharedViewModel = sharedViewModel,
                         )
                     }
@@ -134,29 +141,24 @@ class MainActivity : ComponentActivity() {
     }
 
 
-    override fun onStart() {
-        super.onStart()
-        lifecycleScope.launch(Dispatchers.Main) {
-            if (store.state.value.isPlaying) {
-                Log.i(TAG, "onStart: ")
-                val intent = Intent(this@MainActivity, PlayerService::class.java)
-                intent.action = PlayerService.ACTION_STOP
-                startForegroundService(intent)
+    override fun onResume() {
+        super.onResume()
 
-            }
+        if (store.state.value.isPlaying) {
+            val intent = Intent(this@MainActivity, PlayerService::class.java)
+            intent.action = PlayerService.ACTION_STOP
+            startForegroundService(intent)
+
         }
     }
 
     override fun onStop() {
         super.onStop()
-        lifecycleScope.launch(Dispatchers.Main) {
-            if (store.state.value.isPlaying) {
-                Log.i(TAG, "onStop ")
-                val intent = Intent(this@MainActivity, PlayerService::class.java)
-                intent.action = PlayerService.ACTION_START
-                startForegroundService(intent)
+        if (store.state.value.isPlaying) {
+            val intent = Intent(this@MainActivity, PlayerService::class.java)
+            intent.action = PlayerService.ACTION_START
+            startForegroundService(intent)
 
-            }
         }
     }
 
@@ -171,21 +173,6 @@ class MainActivity : ComponentActivity() {
 //            }
 //        }
 //    }
-    private fun launchIsPlayingObserver() {
-        /*lifecycleScope.launch(Dispatchers.Main) {
-            store.state.collect { state ->
-                if (!state.isPlaying) {
-                    sharedViewModel.dispatchEvent(PlayerEvents.OnStopPlayer)
-                    delay(2000)
-                    Log.i(TAG, "launchIsPlayingObserver: 0------------------------")
-                    Intent(applicationContext, PlayerService::class.java).also {
-                        stopService(it)
-                    }
-                }
-            }
-        }*/
-
-    }
 
 }
 
@@ -193,6 +180,5 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun currentRoute(navController: NavHostController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    Log.i(TAG, "currentRoute: " + navBackStackEntry?.destination?.route)
     return navBackStackEntry?.destination?.route
 }

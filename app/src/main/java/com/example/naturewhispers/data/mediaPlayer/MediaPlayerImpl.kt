@@ -46,26 +46,26 @@ class MediaPlayerImpl @Inject constructor(
     private var job: Job? = null
 
     init {
-        try {
-            player.addListener(this)
-            player.prepare()
-            observePlayerState()
-        } catch (e: Exception) {
-            Log.i(TAG, "[Player] Error: ${e.message}")
+//        job?.cancel()
+        job = coroutineScope.launch {
+            try {
+                player.addListener(this@MediaPlayerImpl)
+                player.prepare()
+                observePlayerState()
+            } catch (e: Exception) {
+                Log.i(TAG, "[Player] Error: ${e.message}")
+            }
         }
     }
 
-    private fun observePlayerState() {
-        job?.cancel()
-        job = coroutineScope.launch {
-            while (true) {
-                if (player.playbackState == Player.STATE_READY)
-                    state.value = state.value.copy(
-                        duration = player.duration / 1000,
-                        currentPosition = player.currentPosition / 1000
-                    )
-                delay(100)
-            }
+    private suspend fun observePlayerState() {
+        while (true) {
+            if (player.playbackState == Player.STATE_READY)
+                state.value = state.value.copy(
+                    duration = player.duration / 1000,
+                    currentPosition = player.currentPosition / 1000
+                )
+            delay(100)
         }
     }
 
@@ -97,8 +97,6 @@ class MediaPlayerImpl @Inject constructor(
     override fun prepare(audio: Audio) {
         Log.i(TAG, "[Player] Player is preparing...${audio}")
         try {
-            observePlayerState()
-
             val localAudioList = LocalData.meditationSounds.map { it.key }
             val mediaItem = MediaItem.Builder()
                 .setUri(audio.uri.ifEmpty { localAudioList.find { it.title == audio.title }!!.uri })
@@ -152,7 +150,7 @@ class MediaPlayerImpl @Inject constructor(
             player.stop()
             player.seekTo(0)
             state.value = state.value.copy(currentPosition = 0, isPlaying = false)
-            job?.cancel()
+//            job?.cancel()
         } catch (e: Exception) {
             e.printStackTrace()
         }

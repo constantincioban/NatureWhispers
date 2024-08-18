@@ -80,7 +80,7 @@ fun BottomSheetPreset(
     val navigateToAddPresetScreenStable: (Int) -> Unit = remember { navigateToAddPresetScreen }
 
 
-    val currentTime = playerState.currentPosition.toFloat()  / (preset.duration - 1)
+    val currentTime = playerState.currentPosition.toFloat()  / preset.duration
     var playWasPressed by remember {
         mutableStateOf(false)
     }
@@ -107,7 +107,8 @@ fun BottomSheetPreset(
 
     LaunchedEffect(playerState.currentPosition) {
         Log.i(TAG, "BottomSheetPreset: ${preset.duration} == ${playerState.currentPosition.toInt()}")
-        if (preset.duration - 1 == playerState.currentPosition.toInt()) {
+        if (preset.duration == playerState.currentPosition.toInt()) {
+            sendEvent(MainEvents.LogStat)
             sendPlayerEventStable(PlayerEvents.OnStopPlayer)
             sendPlayerEventStable(PlayerEvents.OnSeekTo(0))
             playWasPressed = false

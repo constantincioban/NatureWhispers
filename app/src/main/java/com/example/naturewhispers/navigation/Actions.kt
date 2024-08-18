@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.naturewhispers.data.utils.toUriPath
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.Store
 import kotlinx.coroutines.GlobalScope
@@ -46,12 +47,30 @@ sealed class Screens(
 
     companion object {
         val all = listOf(
-            Main, Preset, AddPreset, Calendar, Profile, Auth
+            Main, AddPreset, Calendar, Profile
         )
     }
 }
 
-class Actions(navController: NavHostController) {
+class Actions(private val navController: NavHostController) {
+
+    /**
+     * Navigates to the specified route with the given parameters.
+     *
+     * If the route equals "back", this function will pop the back stack.
+     *
+     * @param route The route to navigate to. If empty or "back", navigates back.
+     * @param params A list of parameters to be appended to the route as part of the URI path.
+     */
+    fun navigateTo(route: String, params: List<Any>) {
+        if (route.isEmpty() || route == "back") {
+            navController.popBackStack()
+        } else {
+            val uri = route + params.toUriPath()
+            navController.navigate(uri)
+        }
+    }
+
 
     val navigateToPreset: (Int, String) -> Unit = { id, title ->
         navController.navigate(Screens.Preset.uri(id, title))

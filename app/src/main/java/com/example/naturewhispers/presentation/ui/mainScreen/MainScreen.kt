@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.naturewhispers.data.local.models.Audio
+import com.example.naturewhispers.navigation.Screens
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.Store
 import com.example.naturewhispers.presentation.ui.PlayerEvents
@@ -40,12 +41,11 @@ import com.example.naturewhispers.presentation.ui.mainScreen.components.StatsPan
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
-    navigateToAddPreset: (Int) -> Unit,
     viewModel: MainViewModel = hiltViewModel(),
     sharedViewModel: SharedViewModel,
+    navigateTo: (route: String, params: List<Any>) -> Unit,
 ) {
-    val navigateToAddPresetStable: (Int) -> Unit = remember { navigateToAddPreset }
-
+    val navigateToStable: (route: String, params: List<Any>) -> Unit = remember { navigateTo }
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -53,7 +53,7 @@ fun MainScreen(
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.padding(bottom = 47.dp),
-                onClick = { navigateToAddPresetStable(0) },
+                onClick = { navigateToStable(Screens.AddPreset.route, listOf(0)) },
                 containerColor = MaterialTheme.colorScheme.tertiary
             ) {
                 Icon(
@@ -69,7 +69,7 @@ fun MainScreen(
             uiState = viewModel.uiState.value,
             playerState = sharedViewModel.state.value,
             sendPlayerEvent = sharedViewModel::dispatchEvent,
-            navigateToAddPreset = navigateToAddPresetStable
+            navigateTo = navigateToStable
         )
     }
 
@@ -82,7 +82,7 @@ fun Content(
     sendPlayerEvent: (PlayerEvents) -> Unit,
     uiState: MainState,
     playerState: PlayerState,
-    navigateToAddPreset: (Int) -> Unit = {}
+    navigateTo: (route: String, params: List<Any>) -> Unit,
 ) {
     val sendEventStable: (MainEvents) -> Unit = remember { sendEvent }
     val sendPlayerEventStable: (PlayerEvents) -> Unit = remember { sendPlayerEvent }
@@ -101,7 +101,7 @@ fun Content(
             sendPlayerEvent = sendPlayerEventStable,
             sendEvent = sendEventStable,
             playerState = playerState,
-            navigateToAddPresetScreen = { id -> navigateToAddPreset(id) },
+            navigateToAddPresetScreen = { id -> navigateTo(Screens.AddPreset.route, listOf(id)) },
         )
     } else activity.window.navigationBarColor = MaterialTheme.colorScheme.surfaceVariant.toArgb()
 
@@ -149,6 +149,7 @@ fun ContentPreview() {
         sendEvent = {},
         sendPlayerEvent = {},
         uiState = MainState(),
-        playerState = PlayerState()
+        playerState = PlayerState(),
+        navigateTo = { _, _ -> }
     )
 }

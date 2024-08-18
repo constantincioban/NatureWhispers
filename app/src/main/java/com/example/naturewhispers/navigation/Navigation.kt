@@ -5,6 +5,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,11 +23,10 @@ fun Navigation(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     actions: Actions,
-    store: Store<AppState>,
     sharedViewModel: SharedViewModel,
     ) {
-//    val actions = remember(navController) { Actions(navController, store) }
-    val storeState = store.state.collectAsState()
+    val actions = remember(navController) { Actions(navController) }
+//    val storeState = store.state.collectAsState()
     val startDestination =
 //        if (storeState.value.isLoggedIn)
             Screens.Main.route
@@ -40,19 +40,19 @@ fun Navigation(
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None },
     ) {
-
+/*
         composable(
             route = Screens.Auth.route,
         ) {
             AuthScreen(store = store)
-        }
+        }*/
 
         composable(
             route = Screens.Main.route,
         ) {
             MainScreen(
-                navigateToAddPreset = actions.navigateToAddPreset,
                 sharedViewModel = sharedViewModel,
+                navigateTo = { route, params -> actions.navigateTo(route, params) },
             )
         }
 
@@ -62,7 +62,7 @@ fun Navigation(
         ) { backStackEntry ->
             AddPresetScreen(
                 presetId = backStackEntry.arguments?.getInt(Screens.Preset.presetIdArg) ?: 0,
-                navigateToMain = actions.navigateToMain,
+                navigateTo = { route, params -> actions.navigateTo(route, params) },
                 snackbarHostState = snackbarHostState,
                 sharedViewModel = sharedViewModel,
             )

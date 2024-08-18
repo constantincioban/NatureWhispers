@@ -18,6 +18,7 @@ import com.example.naturewhispers.presentation.redux.Store
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -120,6 +121,7 @@ class MainViewModel @Inject constructor(
         val duration = if (startDuration != 0L)
             state.value.preliminaryDuration + (System.currentTimeMillis() - startDuration)
             else state.value.preliminaryDuration
+        Log.i(TAG, "logStat: ${TimeUnit.MILLISECONDS.toSeconds(duration)}")
         if (duration <= 1) return
         statDao.upsertStat(
             Stat(

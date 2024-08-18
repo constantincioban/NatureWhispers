@@ -68,7 +68,7 @@ class SharedViewModel @Inject constructor(
                     title = preset.sound,
                     artist = preset.title,
                     uri = preset.fileUri,
-                    durationMillis = preset.duration * 1000L
+                    durationMillis = preset.duration * 1000L + 1000
                 )
             )
         } ?: mediaPlayer.prepare(Audio(title = sound, durationMillis = 30 * 1000L))

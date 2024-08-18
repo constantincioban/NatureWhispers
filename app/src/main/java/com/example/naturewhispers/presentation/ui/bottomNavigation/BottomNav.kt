@@ -1,5 +1,6 @@
 package com.example.naturewhispers.presentation.ui.bottomNavigation
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,7 +18,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +33,8 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.naturewhispers.data.di.TAG
+import com.example.naturewhispers.data.utils.ImmutableList
 import com.example.naturewhispers.navigation.Screens
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.Store
@@ -37,15 +43,19 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BottomBar(
-    navController: NavHostController,
-    store: Store<AppState>
+    navigateTo: (route: String, params: List<Any>) -> Unit,
 ) {
 
-    val navStackBackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navStackBackEntry?.destination
+    val screens = ImmutableList(Screens.all.filter { it.icon != null })
+    val navigateToStable: (route: String, params: List<Any>) -> Unit = remember { navigateTo }
+    var selected by remember {
+        mutableStateOf<Screens>(Screens.Main)
+    }
 
-    Box(contentAlignment = Alignment.Center,
-        modifier = Modifier.windowInsetsPadding(WindowInsets(0,0,0,42))) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.windowInsetsPadding(WindowInsets(0, 0, 0, 42))
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -54,13 +64,12 @@ fun BottomBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Screens.all.forEachIndexed() { _, screen ->
-                if (screen.icon == null) return@forEachIndexed
+            screens.forEachIndexed() { _, screen ->
                 AddItem(
                     screen = screen,
-                    currentDestination = currentDestination,
-                    navController = navController,
-                    store = store
+                    navigateTo = navigateToStable,
+                    selectedScreen = selected,
+                    updateSelected = { selected = it }
                 )
             }
         }
@@ -70,28 +79,23 @@ fun BottomBar(
 @Composable
 fun AddItem(
     screen: Screens,
-    currentDestination: NavDestination?,
-    navController: NavHostController,
-    store: Store<AppState>
+    navigateTo: (route: String, params: List<Any>) -> Unit,
+    selectedScreen: Screens = Screens.Main,
+    updateSelected: (Screens) -> Unit = {},
 ) {
-    val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+    Log.i(TAG, "AddItem: ${screen.title}")
+    val selected = screen.route == selectedScreen.route
     val background =
         if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
     val contentColor =
         if (selected) Color.White else Color.Black
-    val scope = rememberCoroutineScope()
     Box(
         modifier = Modifier
             .clip(CircleShape)
             .background(background)
             .clickable {
-                scope.launch {
-                    store.update { it.copy(topBarTitle = screen.title) }
-                }
-                navController.navigate(screen.route) {
-                    popUpTo(navController.graph.findStartDestination().id)
-                    launchSingleTop = true
-                }
+                navigateTo(screen.route, listOf())
+                updateSelected(screen)
             }
     ) {
         Row(
@@ -101,7 +105,7 @@ fun AddItem(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Icon(
-                imageVector =  screen.icon!!,
+                imageVector = screen.icon!!,
                 contentDescription = "icon",
                 tint = contentColor
             )

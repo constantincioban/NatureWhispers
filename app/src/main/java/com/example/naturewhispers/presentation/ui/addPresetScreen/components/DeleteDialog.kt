@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.naturewhispers.navigation.Screens
 import com.example.naturewhispers.presentation.ui.addPresetScreen.AddPresetEvents
 import com.example.naturewhispers.presentation.ui.addPresetScreen.AddPresetState
 
@@ -31,7 +32,8 @@ fun DeleteDialog(
     modifier: Modifier = Modifier,
     sendEvent: (AddPresetEvents) -> Unit,
     state: AddPresetState,
-    navigateToMain: () -> Unit = {}
+    navigateTo: (route: String, params: List<Any>) -> Unit = { _, _ -> },
+
 ) {
     Dialog(
         onDismissRequest = { sendEvent(AddPresetEvents.OnToggleShowDeleteDialog) },
@@ -73,7 +75,7 @@ fun DeleteDialog(
                     modifier = Modifier
                         .clickable {
                             sendEvent(AddPresetEvents.OnDeletePreset(state.presetId))
-                            navigateToMain()
+                            navigateTo(Screens.Main.route, listOf())
                         }
                         .padding(8.dp)
                 )

@@ -52,7 +52,7 @@ fun StatsPanel(
 
     ) {
     val todaysTime = stats.filter { isSameDate(it.date, System.currentTimeMillis()) }
-        .sumOf { TimeUnit.MILLISECONDS.toMinutes(it.duration) }.toInt()
+        .sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) }.toInt() / 60
     val groupedByDates = stats.groupBy { Instant.ofEpochMilli(it.date).atZone(ZoneId.systemDefault()).toLocalDate() }
     val filteredByGoal = groupedByDates.filter {
         it.value.sumOf { it.duration }.milliseconds.inWholeMinutes >= it.value.last().currentGoal

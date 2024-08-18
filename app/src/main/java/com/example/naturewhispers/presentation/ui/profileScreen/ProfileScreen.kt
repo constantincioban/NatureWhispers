@@ -51,7 +51,6 @@ fun ProfileScreen(
 ) {
     Scaffold(
         modifier = Modifier.safeDrawingPadding(),
-
         ) {
         Content(viewModel.uiState.value, viewModel::sendEvent)
     }

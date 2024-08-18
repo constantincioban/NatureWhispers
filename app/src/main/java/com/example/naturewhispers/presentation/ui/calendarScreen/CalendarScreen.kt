@@ -1,6 +1,7 @@
 package com.example.naturewhispers.presentation.ui.calendarScreen
 
 import android.annotation.SuppressLint
+import android.os.Debug
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -43,9 +44,10 @@ import com.example.naturewhispers.presentation.ui.calendarScreen.components.Stat
 import io.github.boguszpawlowski.composecalendar.SelectableCalendar
 import io.github.boguszpawlowski.composecalendar.kotlinxDateTime.now
 import io.github.boguszpawlowski.composecalendar.rememberSelectableCalendarState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinLocalDate
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -57,12 +59,14 @@ fun CalendarScreen(
     Scaffold(
         modifier = Modifier.safeDrawingPadding(),
         ) {
-        Content(viewModel.stats.value)
+        Content(viewModel.uiState.value.stats)
     }
 }
 
 @Composable
-fun Content(stats: ImmutableList<Stat>) {
+fun Content(
+    stats: ImmutableList<Stat>,
+) {
 
     val calendarState = rememberSelectableCalendarState()
     var statsFiltered by remember {
@@ -72,14 +76,16 @@ fun Content(stats: ImmutableList<Stat>) {
         mutableStateOf(LocalDate.now())
     }
 
+
     LaunchedEffect(key1 = selection, key2 = stats) {
-        statsFiltered = ImmutableList()
-        Log.i(TAG, "Content stats: " + stats.size)
         statsFiltered = ImmutableList(stats.filter {
             isSameDate(it.date, selection.toString())
         })
     }
-
+    /*LaunchedEffect(Unit) {
+        delay(1000)
+        Debug.stopMethodTracing()
+    }*/
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -91,6 +97,7 @@ fun Content(stats: ImmutableList<Stat>) {
             calendarState = calendarState,
             showAdjacentMonths = false,
             dayContent = { selected ->
+
                 val selectedDate = selected.date.toKotlinLocalDate().toString()
 
                 val statsForSelectedDay = stats.filter { isSameDate(it.date, selectedDate) }
@@ -98,16 +105,16 @@ fun Content(stats: ImmutableList<Stat>) {
 
                 val shapeRoundedValue = if (anyStatsInTheSelectedDay) 50.dp else null
 
-                val totalDuration = statsForSelectedDay.sumOf { TimeUnit.MILLISECONDS.toMinutes(it.duration) }.toInt()
+                val totalDuration = statsForSelectedDay.sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) }.toInt() / 60
                 val currentGoal = statsForSelectedDay.lastOrNull()?.currentGoal ?: 1
-
+                Log.i(TAG, "Content: ${selected.date.dayOfMonth} currentGoal = $currentGoal , totalDuration = $totalDuration")
                 val border = if (totalDuration >= currentGoal)
                     BorderStroke(3.dp, MaterialTheme.colorScheme.primary)
                 else
                     null
 
                 val color = when {
-                    selection == selected.date.toKotlinLocalDate() -> MaterialTheme.colorScheme.primary
+                    selection == selected.date -> MaterialTheme.colorScheme.primary
                     anyStatsInTheSelectedDay -> MaterialTheme.colorScheme.tertiary
                     else -> MaterialTheme.colorScheme.onSurface
                 }
@@ -121,7 +128,7 @@ fun Content(stats: ImmutableList<Stat>) {
                         .fillMaxWidth()
                         .height(42.dp)
                         .clickable {
-                            selection = selected.date.toKotlinLocalDate()
+                            selection = selected.date
                             Log.i(TAG, "[Calendar] selection = : $selection")
                         },
                     ) {
@@ -138,9 +145,6 @@ fun Content(stats: ImmutableList<Stat>) {
             }
         )
 
-        Log.i(TAG, "Content: selected " + calendarState.selectionState.selection)
-
-        Log.i(TAG, "Content: " + calendarState.monthState.currentMonth)
         Spacer(modifier = Modifier.height(20.dp))
         if (statsFiltered.isEmpty()) {
             Spacer(modifier = Modifier.fillMaxHeight(0.3f))

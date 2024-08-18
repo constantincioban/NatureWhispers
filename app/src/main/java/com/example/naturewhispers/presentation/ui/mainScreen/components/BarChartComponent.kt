@@ -56,6 +56,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 import kotlin.math.min
 
@@ -66,7 +67,10 @@ fun BarChartComponent(
     stats: ImmutableList<Stat>,
 ) {
 
-    var entries = getLast7DaysStatsAsPairs(stats).map { it.second }.mapIndexed { i, y -> BarEntry(i.toFloat(), y) }
+    val entries = remember(stats) {
+        getLast7DaysStatsAsPairs(stats).map { it.second }.mapIndexed { i, y -> BarEntry(i.toFloat(), y) }
+    }
+    Log.i(TAG, "BarChartComponent: entries = $entries")
     val barColor = MaterialTheme.colorScheme.primary
     Log.i(TAG, "BarChartComponent: stats size = " + stats.size)
 
@@ -99,7 +103,7 @@ fun BarChartComponent(
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(text = "Time in minutes")
             }
-            if (stats.isNotEmpty())
+//            if (stats.isNotEmpty())
                 AndroidView(
                     modifier = modifier
                         .fillMaxSize()
@@ -110,40 +114,37 @@ fun BarChartComponent(
                     },
                     factory = { context ->
                         val chart = BarChart(context)
-                        val data = getLast7DaysStatsAsPairs(stats)
-                        Log.i(TAG, "[BarChartComponent]: last entry = ${data.last()}")
-                        // disable gestures
-                        chart.setTouchEnabled(false)
-                        chart.isDragEnabled = false
-                        chart.isScaleXEnabled = false
-                        chart.isScaleYEnabled = false
 
-                        chart.axisRight.isEnabled = false
-                        chart.axisLeft.isEnabled = false
-                        val xAxis: XAxis = chart.xAxis
-                        xAxis.position = XAxis.XAxisPosition.BOTTOM
-                        xAxis.setDrawGridLines(false)
-                        xAxis.axisLineColor = Color.TRANSPARENT
-                        xAxis.valueFormatter = object : ValueFormatter() {
-                            override fun getFormattedValue(value: Float): String {
-                                return data.map { it.first }[value.toInt()]
+                        // Chart setup moved here to reduce the lambda load
+                        chart.apply {
+                            setTouchEnabled(false)
+                            isDragEnabled = false
+                            isScaleXEnabled = false
+                            isScaleYEnabled = false
+                            axisRight.isEnabled = false
+                            axisLeft.isEnabled = false
+                            description = null
+                            legend.isEnabled = false
+
+                            val xAxis: XAxis = xAxis
+                            xAxis.position = XAxis.XAxisPosition.BOTTOM
+                            xAxis.setDrawGridLines(false)
+                            xAxis.axisLineColor = Color.TRANSPARENT
+                            xAxis.textSize = 12f
+                            xAxis.valueFormatter = object : ValueFormatter() {
+                                override fun getFormattedValue(value: Float): String {
+                                    return getLast7DaysStatsAsPairs(stats).map { it.first }[value.toInt()]
+                                }
                             }
+
+                            val barChartRender = CustomBarChartRender(
+                                this, animator, viewPortHandler
+                            )
+                            barChartRender.setRadius(40)
+                            renderer = barChartRender
+
+                            invalidate()
                         }
-                        xAxis.textSize = 12f
-
-                        chart.description = null
-                        chart.legend.isEnabled = false
-
-                        Log.i(TAG, "BarChartComponent: inside $stats")
-                        entries = data.map { it.second }.mapIndexed() { i, y -> BarEntry(i.toFloat(), y) }
-                        setupData(entries, chart, barColor)
-
-                        val barChartRender =
-                            CustomBarChartRender(chart, chart.animator, chart.viewPortHandler)
-                        barChartRender.setRadius(40)
-                        chart.renderer = barChartRender
-                        chart.invalidate()
-                        chart
                     }
                 )
 
@@ -182,7 +183,9 @@ fun getLast7DaysStatsAsPairs(
     val statsByDate = stats.groupBy {
         Instant.ofEpochMilli(it.date).atZone(zoneId).toLocalDate()
     }.mapValues { entry ->
-        entry.value.sumOf { it.duration.toDouble() / 60000.0f }
+        val timeInMinutes = entry.value.sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) }
+        Log.i(TAG, "getLast7DaysStatsAsPairs: ${entry.key.dayOfMonth} =  $timeInMinutes")
+        entry.value.sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) } / 60
     }
 
     return last7Days.map { date ->
