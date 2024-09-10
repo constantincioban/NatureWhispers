@@ -8,11 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.example.naturewhispers.data.utils.toUriPath
-import com.example.naturewhispers.presentation.redux.AppState
-import com.example.naturewhispers.presentation.redux.Store
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.example.naturewhispers.data.utils.toNavigationPath
 
 sealed class Screens(
     val route: String,
@@ -66,7 +62,7 @@ class Actions(private val navController: NavHostController) {
         if (route.isEmpty() || route == "back") {
             navController.popBackStack()
         } else {
-            val uri = route + params.toUriPath()
+            val uri = route + params.toNavigationPath()
             navController.navigate(uri)
         }
     }

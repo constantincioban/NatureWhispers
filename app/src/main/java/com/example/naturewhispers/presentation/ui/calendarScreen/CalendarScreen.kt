@@ -68,6 +68,8 @@ fun Content(
     stats: ImmutableList<Stat>,
 ) {
 
+    Log.i(TAG, "Content: Render in SelectableCalendar ${stats.size}")
+
     val calendarState = rememberSelectableCalendarState()
     var statsFiltered by remember {
         mutableStateOf(ImmutableList<Stat>())
@@ -93,57 +95,53 @@ fun Content(
             .fillMaxSize()
             .padding(20.dp),
     ) {
-        SelectableCalendar(
-            calendarState = calendarState,
-            showAdjacentMonths = false,
-            dayContent = { selected ->
 
-                val selectedDate = selected.date.toKotlinLocalDate().toString()
+            SelectableCalendar(
+                calendarState = calendarState,
+                showAdjacentMonths = false,
+                dayContent = { selected ->
+                    val selectedDate = selected.date.toKotlinLocalDate().toString()
 
-                val statsForSelectedDay = stats.filter { isSameDate(it.date, selectedDate) }
-                val anyStatsInTheSelectedDay = statsForSelectedDay.isNotEmpty()
+                    val statsForSelectedDay = stats.filter { isSameDate(it.date, selectedDate) }
+                    val anyStatsInTheSelectedDay = statsForSelectedDay.isNotEmpty()
+                    val shapeRoundedValue = if (anyStatsInTheSelectedDay) 50.dp else 0.dp
 
-                val shapeRoundedValue = if (anyStatsInTheSelectedDay) 50.dp else null
-
-                val totalDuration = statsForSelectedDay.sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) }.toInt() / 60
-                val currentGoal = statsForSelectedDay.lastOrNull()?.currentGoal ?: 1
-                Log.i(TAG, "Content: ${selected.date.dayOfMonth} currentGoal = $currentGoal , totalDuration = $totalDuration")
-                val border = if (totalDuration >= currentGoal)
-                    BorderStroke(3.dp, MaterialTheme.colorScheme.primary)
-                else
-                    null
-
-                val color = when {
-                    selection == selected.date -> MaterialTheme.colorScheme.primary
-                    anyStatsInTheSelectedDay -> MaterialTheme.colorScheme.tertiary
-                    else -> MaterialTheme.colorScheme.onSurface
-                }
-                Card(
-                    elevation = CardDefaults.cardElevation(2.dp),
-                    shape = RoundedCornerShape(shapeRoundedValue ?: 5.dp),
-                    border = border,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .fillMaxWidth()
-                        .height(42.dp)
-                        .clickable {
-                            selection = selected.date
-                            Log.i(TAG, "[Calendar] selection = : $selection")
-                        },
-                    ) {
-                    Text(
-                        text = selected.date.dayOfMonth.toString(),
-                        fontSize = 18.sp,
+                    val totalDuration = statsForSelectedDay.sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) }.toInt() / 60
+                    val currentGoal = statsForSelectedDay.lastOrNull()?.currentGoal ?: 1
+                    val border = if (totalDuration >= currentGoal)
+                        BorderStroke(3.dp, MaterialTheme.colorScheme.primary)
+                    else
+                        null
+                    val color = when {
+                        selection == selected.date -> MaterialTheme.colorScheme.primary
+                        anyStatsInTheSelectedDay -> MaterialTheme.colorScheme.tertiary
+                        else -> MaterialTheme.colorScheme.onSurface
+                    }
+                    Card(
+                        elevation = CardDefaults.cardElevation(2.dp),
+                        shape = RoundedCornerShape(shapeRoundedValue),
+                        border = border,
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 7.dp),
-                        textAlign = TextAlign.Center,
-                        color = color
-                    )
+                            .padding(4.dp)
+                            .fillMaxWidth()
+                            .height(42.dp)
+                            .clickable {
+                                selection = selected.date
+                            },
+                        ) {
+                        Text(
+                            text = selected.date.dayOfMonth.toString(),
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 7.dp),
+                            textAlign = TextAlign.Center,
+                            color = color
+                        )
+                    }
                 }
-            }
-        )
+            )
 
         Spacer(modifier = Modifier.height(20.dp))
         if (statsFiltered.isEmpty()) {

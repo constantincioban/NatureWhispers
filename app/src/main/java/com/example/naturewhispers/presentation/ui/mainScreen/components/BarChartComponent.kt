@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
@@ -70,9 +71,7 @@ fun BarChartComponent(
     val entries = remember(stats) {
         getLast7DaysStatsAsPairs(stats).map { it.second }.mapIndexed { i, y -> BarEntry(i.toFloat(), y) }
     }
-    Log.i(TAG, "BarChartComponent: entries = $entries")
     val barColor = MaterialTheme.colorScheme.primary
-    Log.i(TAG, "BarChartComponent: stats size = " + stats.size)
 
     Card(
         elevation = CardDefaults.cardElevation(5.dp),
@@ -103,7 +102,14 @@ fun BarChartComponent(
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(text = "Time in minutes")
             }
-//            if (stats.isNotEmpty())
+            if (stats.isEmpty())
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = "No stats to display",
+                        modifier = Modifier
+                    )
+                }
+            else
                 AndroidView(
                     modifier = modifier
                         .fillMaxSize()
@@ -183,8 +189,6 @@ fun getLast7DaysStatsAsPairs(
     val statsByDate = stats.groupBy {
         Instant.ofEpochMilli(it.date).atZone(zoneId).toLocalDate()
     }.mapValues { entry ->
-        val timeInMinutes = entry.value.sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) }
-        Log.i(TAG, "getLast7DaysStatsAsPairs: ${entry.key.dayOfMonth} =  $timeInMinutes")
         entry.value.sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) } / 60
     }
 

@@ -39,6 +39,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -79,11 +80,13 @@ fun AddPresetScreen(
         snackbarHostState.showSnackbar(message = it)
     }
 
+    val uiState = viewModel.uiState.collectAsState()
+
     Scaffold(
         modifier = Modifier.safeDrawingPadding(),
     ) {
         Content(
-            viewModel.uiState.value,
+            uiState.value,
             viewModel::sendEvent,
             navigateTo,
             sharedViewModel::dispatchEvent,

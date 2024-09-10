@@ -142,6 +142,12 @@ dependencies {
 
 // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+// Testing
+    testImplementation("junit:junit:4.13.2")
+    testImplementation ("com.google.truth:truth:1.1.3")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2-native-mt")
+    testImplementation ("app.cash.turbine:turbine:0.12.1")
 }
 
 kapt {

@@ -1,9 +1,12 @@
 package com.example.naturewhispers.data.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.provider.OpenableColumns
-import android.util.Log
+import android.provider.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,13 +15,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.example.naturewhispers.data.di.TAG
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -27,8 +27,15 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
+fun Activity.openAppSettings() {
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    ).also(::startActivity)
+}
+
 // Extension function to convert parameters to a URI path string
-fun List<Any>.toUriPath(): String {
+fun List<Any>.toNavigationPath(): String {
     return if (this.isEmpty()) {
         ""
     } else {
@@ -166,20 +173,6 @@ inline fun <reified T> Flow<T>.observeWithLifecycle(
             flowWithLifecycle(lifecycleOwner.lifecycle, minActiveState).collect(action)
         }
     }
-}
-
-fun String.distinctChars(): String {
-    var word = ""
-    this.forEachIndexed { index, c ->
-        if (index == 0) {
-            word += c
-            return@forEachIndexed
-        }
-        if (this[index] == this[index - 1])
-            return@forEachIndexed
-        word += c
-    }
-    return word
 }
 
 fun Date.formatToString(format: String, locale: Locale = Locale.getDefault()): String {

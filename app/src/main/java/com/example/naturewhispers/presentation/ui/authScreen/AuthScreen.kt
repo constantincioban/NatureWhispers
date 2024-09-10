@@ -107,8 +107,8 @@ fun GoogleSignInButton(store: Store<AppState>,) {
 
                 store.update { it.copy(
                     username = googleIdTokenCredential.displayName ?: "User",
-                    userId = googleIdTokenCredential.id,
-                    isLoggedIn = true
+//                    userId = googleIdTokenCredential.id,
+//                    isLoggedIn = true
                 ) }
                 Log.i(TAG, "[Auth]: googleIdToken = $googleIdToken")
 

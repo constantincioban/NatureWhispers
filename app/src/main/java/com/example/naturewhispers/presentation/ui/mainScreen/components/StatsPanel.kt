@@ -1,6 +1,5 @@
 package com.example.naturewhispers.presentation.ui.mainScreen.components
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,9 +19,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.entities.Stat
 import com.example.naturewhispers.data.utils.ImmutableList
 import com.example.naturewhispers.data.utils.countConsecutiveDates
@@ -47,18 +42,11 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun StatsPanel(
     modifier: Modifier = Modifier,
-    stats: ImmutableList<Stat>,
     dailyGoal: Float = 0f,
+    todaysTime: Int,
+    streak: Int,
 
     ) {
-    val todaysTime = stats.filter { isSameDate(it.date, System.currentTimeMillis()) }
-        .sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) }.toInt() / 60
-    val groupedByDates = stats.groupBy { Instant.ofEpochMilli(it.date).atZone(ZoneId.systemDefault()).toLocalDate() }
-    val filteredByGoal = groupedByDates.filter {
-        it.value.sumOf { it.duration }.milliseconds.inWholeMinutes >= it.value.last().currentGoal
-    }
-    val firstStatPerDate = filteredByGoal.map { it.value.first() }
-    val streak = countConsecutiveDates(firstStatPerDate.map { it.date }.sortedDescending())
     Card(
         elevation = CardDefaults.cardElevation(10.dp),
         shape = RoundedCornerShape(10.dp),
@@ -136,6 +124,9 @@ fun StatsPanel(
 @Composable
 fun StatsPanelPreview() {
     NatureWhispersTheme {
-        StatsPanel(stats = ImmutableList())
+        StatsPanel(
+            todaysTime = 2,
+            streak = 1
+        )
     }
 }

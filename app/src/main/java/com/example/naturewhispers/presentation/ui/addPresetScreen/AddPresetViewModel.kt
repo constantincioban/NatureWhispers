@@ -3,8 +3,10 @@ package com.example.naturewhispers.presentation.ui.addPresetScreen
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshotFlow
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -20,6 +22,11 @@ import com.example.naturewhispers.presentation.redux.Store
 import com.example.naturewhispers.presentation.ui.mainScreen.MainEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,8 +39,8 @@ class AddPresetViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private var state = mutableStateOf(AddPresetState())
-    val uiState: State<AddPresetState> = state
+    private var state = MutableStateFlow(AddPresetState())
+    val uiState: StateFlow<AddPresetState> = state
 
     private val _eventChannel = Channel<String>()
     val eventChannel = _eventChannel.receiveAsFlow()
@@ -53,8 +60,44 @@ class AddPresetViewModel @Inject constructor(
                     chosenPreliminarySound = preset.sound,
                     chosenSound = preset.sound,
                 )
+
             }
         }
+        viewModelScope.launch {
+            snapshotFlow { state.value.chosenSound }
+                .distinctUntilChanged()
+                .collect { chosenSound ->
+                    if (LocalData.meditationSounds.map { it.key.title }.contains(chosenSound))
+                        state.value = state.value.copy(maxDuration = 3600f)
+                }
+        }
+        viewModelScope.launch {
+            uiState.map { it.maxDuration }
+                .distinctUntilChanged()
+                .collect { _ ->
+                    println("StateFlow: maxDuration changed")
+                    state.value = state.value.copy(duration = 0f)
+                }
+        }
+        /*viewModelScope.launch {
+            snapshotFlow { state.value.maxDuration }
+                .distinctUntilChanged()
+                .collect { _ ->
+                    println("snapshotFlow: maxDuration changed ")
+                    state.value = state.value.copy(duration = 0f)
+                }
+        }*/
+        viewModelScope.launch {
+            snapshotFlow { state.value.title }
+                .distinctUntilChanged()
+                .collect { title ->
+                    println("snapshotFlow: title changed ")
+                    if (title.length > 20) {
+                        state.value = state.value.copy(title = state.value.title.substring(0, 20))
+                        sendEvent(ToastMessages.TitleTooLong)
+                    }
+                }
+            }
     }
 
     fun sendEvent(event: AddPresetEvents) = viewModelScope.launch {
@@ -71,8 +114,11 @@ class AddPresetViewModel @Inject constructor(
             is AddPresetEvents.OnUpdateFileUri -> updateFileUri(event.fileUri)
             is AddPresetEvents.OnUpdateMaxDuration -> updateMaxDuration(event.duration)
             is AddPresetEvents.OnUpdateContentType -> updateContentType(event.type)
+            is AddPresetEvents.OnSendToastMessage -> sendEvent(event.message)
         }
     }
+
+
 
     private fun updateContentType(type: ContentType) = viewModelScope.launch {
         store.update { it.copy(contentType = type) }
@@ -80,7 +126,8 @@ class AddPresetViewModel @Inject constructor(
 
 
     private fun updateMaxDuration(duration: Float) {
-        state.value = state.value.copy(maxDuration = duration, duration = 0f)
+        println("updateMaxDuration: $duration")
+        state.value = state.value.copy(maxDuration = duration)
     }
 
     private fun updateFileUri(fileUri: String) {
@@ -130,15 +177,19 @@ class AddPresetViewModel @Inject constructor(
         val sound = state.value.chosenSound
 
         if (title.isEmpty()) {
-            sendEvent("Title cannot be empty!")
+            sendEvent(ToastMessages.TitleCannotBeEmpty)
+            return false
+        }
+        if (title.length > 20) {
+            sendEvent(ToastMessages.TitleTooLong)
             return false
         }
         if (duration < 1) {
-            sendEvent("Duration is not valid")
+            sendEvent(ToastMessages.DurationIsNotValid)
             return false
         }
         if (sound.isEmpty()) {
-            sendEvent("Pick a nature sound!")
+            sendEvent(ToastMessages.PickANatureSound)
             return false
         }
 
@@ -151,18 +202,14 @@ class AddPresetViewModel @Inject constructor(
 
     private fun updateChosenSound() {
         state.value = state.value.copy(chosenSound = state.value.chosenPreliminarySound)
-        if (LocalData.meditationSounds.map { it.key.title }.contains(state.value.chosenPreliminarySound))
-            state.value = state.value.copy(maxDuration = 3600f)
     }
 
     private fun updateTitle(title: String) {
-        if (title.length <= 20)
-            state.value = state.value.copy(title = title)
-        else sendEvent("No more than 20 characters")
+        state.value = state.value.copy(title = title)
     }
 
-    private fun sendEvent(message: String) = viewModelScope.launch {
-        _eventChannel.send(message)
+    private fun sendEvent(toast: ToastMessages) = viewModelScope.launch {
+        _eventChannel.send(toast.message)
     }
 
 
@@ -181,7 +228,7 @@ sealed interface AddPresetEvents {
     data class OnUpdateFileUri(val fileUri: String) : AddPresetEvents
     data class OnUpdateMaxDuration(val duration: Float): AddPresetEvents
     data class OnUpdateContentType(val type: ContentType) : AddPresetEvents
-
+    data class OnSendToastMessage(val message: ToastMessages): AddPresetEvents
 }
 
 data class AddPresetState(
@@ -197,3 +244,10 @@ data class AddPresetState(
     val fileUri: String = "",
     val playingSound: String = "",
 )
+
+enum class ToastMessages(val message: String) {
+    TitleTooLong("Title cannot be longer than 20 characters"),
+    TitleCannotBeEmpty("Title cannot be empty"),
+    DurationIsNotValid("Duration is not valid"),
+    PickANatureSound("Pick a nature sound")
+}

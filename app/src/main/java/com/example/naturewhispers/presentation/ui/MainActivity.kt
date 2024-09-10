@@ -7,69 +7,59 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Debug
-import android.provider.DocumentsContract
-import android.provider.OpenableColumns
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.app.ActivityCompat
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.naturewhispers.R
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.foregroundService.PlayerService
-import com.example.naturewhispers.data.utils.observeWithLifecycle
+import com.example.naturewhispers.data.permission.NOTIFICATION_PERMISSION
+import com.example.naturewhispers.data.permission.PermissionDialog
+import com.example.naturewhispers.data.permission.isPermissionGranted
+import com.example.naturewhispers.data.permission.permissionLauncher
+import com.example.naturewhispers.data.utils.openAppSettings
 import com.example.naturewhispers.navigation.Actions
 import com.example.naturewhispers.navigation.Navigation
 import com.example.naturewhispers.navigation.Screens
 import com.example.naturewhispers.presentation.components.NWCustomTheme
 import com.example.naturewhispers.presentation.redux.AppState
-import com.example.naturewhispers.presentation.redux.ContentType
 import com.example.naturewhispers.presentation.redux.Store
 import com.example.naturewhispers.presentation.ui.bottomNavigation.BottomBar
-import com.example.naturewhispers.presentation.ui.theme.NatureWhispersTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var store: Store<AppState>
     private val sharedViewModel: SharedViewModel by viewModels()
-
 
     @SuppressLint("WrongConstant")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -86,18 +76,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 //        val traceFile = File(getExternalFilesDir(null), "tracefile.trace")
 //        Debug.startMethodTracing(traceFile.absolutePath)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 
-            ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                0
-            )
-        }
         enableEdgeToEdge()
         setContent {
+
             val darkTheme = store.state.map { it.darkTheme }.filterNot { it.isEmpty() }
                 .collectAsState(initial = isSystemInDarkTheme().toString())
             NWCustomTheme(darkTheme = darkTheme.value == true.toString()) {
+
+
+
+
+
                 val navController = rememberNavController()
                 val snackbarHostState = remember { SnackbarHostState() }
                 val actions = remember(navController) { Actions(navController) }
@@ -133,13 +123,13 @@ class MainActivity : ComponentActivity() {
                             actions = actions,
                             sharedViewModel = sharedViewModel,
                         )
+
                     }
 
                 }
             }
         }
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -174,11 +164,4 @@ class MainActivity : ComponentActivity() {
 //        }
 //    }
 
-}
-
-
-@Composable
-fun currentRoute(navController: NavHostController): String? {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.route
 }

@@ -19,12 +19,12 @@ interface StatDao {
     fun getStats(): Flow<List<Stat>>
 
     @Query("select * from stats where :id = id")
-    fun getStatById(id: Int): Stat?
+    suspend fun getStatById(id: Int): Stat?
 
     @Delete
     suspend fun deleteStat(stat: Stat)
 
     @Transaction
-    @Query("select * from stats where id = :presetId")
+    @Query("select * from stats where presetId = :presetId")
     fun  getStatsByPresetId(presetId: Int): Flow<List<Stat>>
 }

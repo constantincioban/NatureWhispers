@@ -10,5 +10,6 @@ data class Stat(
     val date: Long = 0,
     val duration: Long = 0,
     val presetTitle: String = "",
+    val presetId: Int = 0,
     val currentGoal: Int = 0,
 )
