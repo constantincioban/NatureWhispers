@@ -3,6 +3,7 @@ package com.example.naturewhispers.presentation.ui.mainScreen
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.naturewhispers.data.di.TAG
@@ -12,14 +13,19 @@ import com.example.naturewhispers.data.local.db.StatDao
 import com.example.naturewhispers.data.entities.Stat
 import com.example.naturewhispers.data.local.preferences.SettingsManager
 import com.example.naturewhispers.data.utils.ImmutableList
+import com.example.naturewhispers.data.utils.countConsecutiveDates
+import com.example.naturewhispers.data.utils.isSameDate
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.ContentType
 import com.example.naturewhispers.presentation.redux.Store
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -33,7 +39,7 @@ class MainViewModel @Inject constructor(
     private var state = mutableStateOf(MainState())
     val uiState: State<MainState> = state
 
-    private var startDuration: Long = 0
+    private var startTimestamp: Long = 0
 
 
     init {
@@ -74,36 +80,62 @@ class MainViewModel @Inject constructor(
         }
         viewModelScope.launch {
             statDao.getStats().collectLatest {
-                state.value = state.value.copy(stats = ImmutableList(it))
+                state.value = state.value.copy(
+                    todaysTime = calculateTodaysTime(it),
+                    streak = calculateStreak(it),
+                    stats = ImmutableList(it)
+                )
             }
+        }
+        observeCurrentPreset()
+    }
+
+    private fun observeCurrentPreset() = viewModelScope.launch {
+        snapshotFlow { state.value.currentPreset }.collectLatest {
+                state.value = state.value.copy(isBottomSheetShown = it != null)
         }
     }
 
     fun sendEvent(event: MainEvents) = viewModelScope.launch {
         when (event) {
-            is MainEvents.ToggleBottomSheet -> toggleBottomSheet(event.id)
             is MainEvents.LogStat -> logStat()
             is MainEvents.ToggleIsLoading -> toggleIsLoading()
             is MainEvents.OnUpdateProfilePic -> updateProfilePic(event.uri)
             is MainEvents.LogPreliminaryDuration -> logPreliminaryDuration()
             is MainEvents.OnUpdateContentType -> updateContentType(event.type)
+            MainEvents.SetStartDuration -> setStartDuration()
+            is MainEvents.OnPresetSelected -> updateCurrentPreset(event.id)
         }
+    }
+
+
+    private fun calculateTodaysTime(stats: List<Stat>): Int {
+        return  stats.filter { isSameDate(it.date, System.currentTimeMillis()) }
+            .sumOf { TimeUnit.MILLISECONDS.toSeconds(it.duration) }.toInt() / 60
+    }
+
+    private fun calculateStreak(stats: List<Stat>): Int {
+        val groupedByDates = stats.groupBy { Instant.ofEpochMilli(it.date).atZone(ZoneId.systemDefault()).toLocalDate() }
+        val filteredByGoal = groupedByDates.filter {
+            it.value.sumOf { it.duration }.milliseconds.inWholeMinutes >= it.value.last().currentGoal
+        }
+        val firstStatPerDate = filteredByGoal.map { it.value.first() }
+        return countConsecutiveDates(firstStatPerDate.map { it.date }.sortedDescending())
     }
 
     private fun updateContentType(type: ContentType) = viewModelScope.launch {
         store.update { it.copy(contentType = type) }
     }
 
+    private fun setStartDuration() {
+        startTimestamp = System.currentTimeMillis()
+    }
 
     private fun logPreliminaryDuration() {
-        if (startDuration == 0L)
-            startDuration = System.currentTimeMillis()
-        else {
-            val currentDuration = System.currentTimeMillis() - startDuration
-            state.value =
-                state.value.copy(preliminaryDuration = state.value.preliminaryDuration + currentDuration)
-            startDuration = 0L
-        }
+        if (startTimestamp == 0L) return
+        val currentDuration = System.currentTimeMillis() - startTimestamp
+        state.value = state.value.copy(preliminaryDuration = state.value.preliminaryDuration + currentDuration)
+        startTimestamp = 0L
     }
 
     private fun updateProfilePic(uri: String) = viewModelScope.launch {
@@ -116,29 +148,24 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun logStat() {
-        if (state.value.preliminaryDuration == 0L && startDuration == 0L) return
-
-        val duration = if (startDuration != 0L)
-            state.value.preliminaryDuration + (System.currentTimeMillis() - startDuration)
-            else state.value.preliminaryDuration
-        Log.i(TAG, "logStat: ${TimeUnit.MILLISECONDS.toSeconds(duration)}")
-        if (duration <= 1) return
+        logPreliminaryDuration()
+        if (TimeUnit.MILLISECONDS.toSeconds(state.value.preliminaryDuration) <= 1L) return
+        println("Logging stat")
         statDao.upsertStat(
             Stat(
-                duration = duration,
+                duration = state.value.preliminaryDuration,
                 date = System.currentTimeMillis(),
                 presetTitle = state.value.currentPreset?.title ?: "Unknown",
+                presetId = state.value.currentPreset?.id ?: 0,
                 currentGoal = store.state.value.dailyGoal.ifEmpty { "1" }.toInt()
             )
         )
-        startDuration = 0L
+        startTimestamp = 0L
         state.value = state.value.copy(preliminaryDuration = 0L)
     }
 
-    private fun toggleBottomSheet(id: Int) {
-        state.value = state.value.copy(isBottomSheetShown = !state.value.isBottomSheetShown,)
-        if (id != 0)
-            state.value = state.value.copy(currentPreset = state.value.presets.find { it.id == id })
+    private fun updateCurrentPreset(id: Int) {
+        state.value = state.value.copy(currentPreset = state.value.presets.find { it.id == id })
     }
 
 }
@@ -153,15 +180,19 @@ data class MainState(
     val dailyGoal: Float = 0F,
     val profilePicUri: String = "",
     val preliminaryDuration: Long = 0,
+    val todaysTime: Int = 0,
+    val streak: Int = 0,
     val presets: ImmutableList<Preset> = ImmutableList(),
     val stats: ImmutableList<Stat> = ImmutableList(),
 )
 
 sealed interface MainEvents {
-    data class ToggleBottomSheet(val id: Int) : MainEvents
     data object LogStat : MainEvents
+    data object SetStartDuration : MainEvents
     data object LogPreliminaryDuration : MainEvents
     data object ToggleIsLoading : MainEvents
     data class OnUpdateProfilePic(val uri: String) : MainEvents
     data class OnUpdateContentType(val type: ContentType) : MainEvents
+    data class OnPresetSelected(val id: Int) : MainEvents
+
 }

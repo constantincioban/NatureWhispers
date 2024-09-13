@@ -181,8 +181,11 @@ fun BottomSheetPreset(
                         onClick = {
                             if (isLoading) return@Button
                             playWasPressed = true
+                            if (playerState.isPlaying)
+                                sendEventStable(MainEvents.LogPreliminaryDuration)
+                            else
+                                sendEventStable(MainEvents.SetStartDuration)
                             sendPlayerEventStable(PlayerEvents.OnTogglePlayPause)
-                            sendEventStable(MainEvents.LogPreliminaryDuration)
                         }) {
 
                         if (isLoading) {

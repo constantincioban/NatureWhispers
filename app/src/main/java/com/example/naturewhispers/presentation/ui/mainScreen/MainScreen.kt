@@ -16,18 +16,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.naturewhispers.data.local.models.Audio
+import com.example.naturewhispers.R
+import com.example.naturewhispers.data.permission.NOTIFICATION_PERMISSION
+import com.example.naturewhispers.data.permission.PermissionDialog
+import com.example.naturewhispers.data.permission.ShowPermissionRationale
+import com.example.naturewhispers.data.permission.isPermissionGranted
+import com.example.naturewhispers.data.permission.permissionLauncher
+import com.example.naturewhispers.data.utils.openAppSettings
 import com.example.naturewhispers.navigation.Screens
-import com.example.naturewhispers.presentation.redux.AppState
-import com.example.naturewhispers.presentation.redux.Store
 import com.example.naturewhispers.presentation.ui.PlayerEvents
 import com.example.naturewhispers.presentation.ui.PlayerState
 import com.example.naturewhispers.presentation.ui.SharedViewModel
@@ -88,6 +96,18 @@ fun Content(
     val sendPlayerEventStable: (PlayerEvents) -> Unit = remember { sendPlayerEvent }
 
     val activity = LocalContext.current as Activity
+    var showPermissionDialog by remember { mutableStateOf(false) }
+
+    if (!isPermissionGranted(activity, NOTIFICATION_PERMISSION))
+        showPermissionDialog = true
+
+    ShowPermissionRationale(
+        context = activity,
+        showPermissionDialog = showPermissionDialog,
+        permission = NOTIFICATION_PERMISSION,
+        description = stringResource(R.string.post_notifications_permission_description),
+        permanentlyDeclinedDescription = stringResource(R.string.post_notifications_permanently_declined_description)
+    )
 
 
     if (uiState.isBottomSheetShown && uiState.currentPreset != null) {
@@ -95,7 +115,7 @@ fun Content(
             preset = uiState.currentPreset,
             onDismiss = {
                 sendPlayerEventStable(PlayerEvents.OnStopPlayer)
-                sendEventStable(MainEvents.ToggleBottomSheet(0))
+                sendEventStable(MainEvents.OnPresetSelected(0))
                 sendEventStable(MainEvents.LogStat)
             },
             sendPlayerEvent = sendPlayerEventStable,
@@ -120,7 +140,7 @@ fun Content(
             modifier = Modifier.padding(top = 20.dp, bottom = 8.dp, start = 20.dp),
             fontWeight = FontWeight.Bold
         )
-        StatsPanel(stats = uiState.stats, dailyGoal = uiState.dailyGoal)
+        StatsPanel(dailyGoal = uiState.dailyGoal, todaysTime = uiState.todaysTime, streak = uiState.streak)
         Text(
             text = "Favorites",
             modifier = Modifier.padding(top = 20.dp, bottom = 8.dp, start = 20.dp),
@@ -129,7 +149,7 @@ fun Content(
         PresetsSection(
             presets = uiState.presets
         ) { id ->
-            sendEventStable(MainEvents.ToggleBottomSheet(id))
+            sendEventStable(MainEvents.OnPresetSelected(id))
             sendPlayerEventStable(PlayerEvents.OnPreparePlayer(id))
         }
         Text(
@@ -141,6 +161,7 @@ fun Content(
 
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
