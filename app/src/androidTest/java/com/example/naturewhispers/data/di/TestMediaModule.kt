@@ -1,7 +1,6 @@
 package com.example.naturewhispers.data.di
 
 import MediaPlayerImpl
-import android.app.Application
 import android.content.Context
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -11,7 +10,6 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
 import com.example.naturewhispers.data.mediaPlayer.IMediaPlayer
 import com.example.naturewhispers.data.mediaPlayer.PlayerManager
-import com.example.naturewhispers.data.notification.NWNotificationManager
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.Store
 import dagger.Module
@@ -19,13 +17,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Inject
 import javax.inject.Singleton
-
 
 @Module
 @InstallIn(SingletonComponent::class)
-class MediaModule {
+class TestMediaModule {
 
     @Provides
     @Singleton
@@ -47,24 +43,6 @@ class MediaModule {
         .build()
 
 
-    @Provides
-    @Singleton
-    fun provideMediaSession(
-        @ApplicationContext context: Context,
-        player: ExoPlayer,
-    ): MediaSession = MediaSession.Builder(context, player).build()
-
-    @Provides
-    @Singleton
-    fun provideNotificationManager(
-        @ApplicationContext context: Context,
-        player: ExoPlayer,
-    ): NWNotificationManager = NWNotificationManager(
-        context = context,
-        exoPlayer = player
-    )
-
-
     @Singleton
     @Provides
     fun provideMediaPlayer(
@@ -79,6 +57,13 @@ class MediaModule {
 
     @Provides
     @Singleton
+    fun provideMediaSession(
+        @ApplicationContext context: Context,
+        player: ExoPlayer,
+    ): MediaSession = MediaSession.Builder(context, player).build()
+
+    @Provides
+    @Singleton
     fun providePlayerManager(
         player: IMediaPlayer,
         store: Store<AppState>
@@ -86,5 +71,4 @@ class MediaModule {
         mediaPlayer = player,
         store = store,
     )
-
 }

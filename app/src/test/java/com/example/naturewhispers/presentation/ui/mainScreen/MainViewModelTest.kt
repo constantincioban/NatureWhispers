@@ -1,10 +1,8 @@
 package com.example.naturewhispers.presentation.ui.mainScreen
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.example.naturewhispers.MainDispatcherRule
 import com.example.naturewhispers.data.entities.Preset
-import com.example.naturewhispers.data.entities.Stat
 import com.example.naturewhispers.data.local.db.PresetDao
 import com.example.naturewhispers.data.local.db.PresetDaoFake
 import com.example.naturewhispers.data.local.db.StatDao
@@ -14,15 +12,9 @@ import com.example.naturewhispers.data.preferences.SettingsManagerFake
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.ContentType
 import com.example.naturewhispers.presentation.redux.Store
-import com.example.naturewhispers.presentation.ui.addPresetScreen.AddPresetViewModel
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -31,7 +23,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.util.concurrent.TimeUnit
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(JUnit4::class)
 class MainViewModelTest {
 
@@ -60,6 +51,47 @@ class MainViewModelTest {
         statDao = StatDaoFake()
         settingsManager = SettingsManagerFake()
         viewModel = MainViewModel(presetDao, statDao, settingsManager, store)
+    }
+
+    @Test
+    fun `init, check that state is initialized with preferences values`() = runTest {
+        val username = "test_username"
+        val dailyGoal = 10
+        val profilePicUri = "test_uri"
+
+        settingsManager.saveStringSetting(SettingsManager.USERNAME, username)
+        settingsManager.saveStringSetting(SettingsManager.PROFILE_PIC_URI, profilePicUri)
+        settingsManager.saveIntSetting(SettingsManager.DAILY_GOAL, dailyGoal)
+
+
+        viewModel = MainViewModel(presetDao, statDao, settingsManager, store)
+        assertThat(viewModel.uiState.value.username).isEqualTo(username)
+        assertThat(viewModel.uiState.value.dailyGoal).isEqualTo(dailyGoal.toFloat())
+        assertThat(viewModel.uiState.value.profilePicUri).isEqualTo(profilePicUri)
+    }
+
+    @Test
+    fun `init, check that store is updated with preferences values`() = runTest {
+        val username = "test_username"
+        val dailyGoal = 10
+        val profilePicUri = "test_uri"
+
+        settingsManager.saveStringSetting(SettingsManager.USERNAME, username)
+        settingsManager.saveStringSetting(SettingsManager.PROFILE_PIC_URI, profilePicUri)
+        settingsManager.saveIntSetting(SettingsManager.DAILY_GOAL, dailyGoal)
+
+
+        viewModel = MainViewModel(presetDao, statDao, settingsManager, store)
+        assertThat(store.state.value.username).isEqualTo(username)
+        assertThat(store.state.value.dailyGoal).isEqualTo(dailyGoal.toString())
+        assertThat(store.state.value.profilePicUri).isEqualTo(profilePicUri)
+    }
+
+    @Test
+    fun `init, check that state has latest presets`() = runTest {
+        presetDao.upsertPreset(preset)
+        viewModel = MainViewModel(presetDao, statDao, settingsManager, store)
+        assertThat(viewModel.uiState.value.presets).containsExactly(preset)
     }
 
     @Test

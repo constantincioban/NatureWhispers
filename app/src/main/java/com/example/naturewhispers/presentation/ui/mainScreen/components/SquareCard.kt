@@ -15,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.naturewhispers.TestTags
 import com.example.naturewhispers.data.entities.Preset
 import com.example.naturewhispers.data.local.predefined.LocalData
 import com.example.naturewhispers.data.utils.formatDuration
@@ -36,7 +38,9 @@ fun SquareCard(
     Card(
         elevation = CardDefaults.cardElevation(10.dp),
         shape = RoundedCornerShape(10.dp),
-        modifier = Modifier.clickable { onClick(item.id) }
+        modifier = Modifier
+            .clickable { onClick(item.id) }
+            .testTag(TestTags.PRESET_CARD)
     ) {
         Column(
             modifier = modifier.size(100.dp).padding(5.dp),

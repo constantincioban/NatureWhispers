@@ -59,10 +59,7 @@ class CalendarViewModel @Inject constructor(
 
 data class CalendarState(
     val stats: ImmutableList<Stat> = ImmutableList(),
-    val statsFiltered: ImmutableList<Stat> = ImmutableList(),
     val selectedDate: LocalDate = LocalDate.now(),
-    val dateToStats: Map<Long, List<Stat>> = mapOf(),
-    val dateToGoalStatusMap: Map<Long, Boolean> = mapOf(),
 )
 
 sealed interface CalendarEvents {

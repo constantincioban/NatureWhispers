@@ -49,7 +49,6 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun updateTheme(darkTheme: Boolean) = viewModelScope.launch {
-        Log.i(TAG, "updateTheme: ${darkTheme}")
         store.update { it.copy(darkTheme = darkTheme.toString()) }
         _state.value = _state.value.copy(darkTheme = darkTheme)
         settingsManager.saveStringSetting(SettingsManager.DARK_THEME, darkTheme.toString())
@@ -72,7 +71,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun updateDailyGoal(dailyGoal: String) {
-        if ((dailyGoal.length < 4 && dailyGoal.isDigitsOnly()) || dailyGoal.isEmpty())
+        if ((dailyGoal.length < 4 && dailyGoal.all { it.isDigit() }) || dailyGoal.isEmpty())
             _state.value = _state.value.copy(dailyGoalPreliminary = dailyGoal.trim())
     }
 

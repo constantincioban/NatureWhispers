@@ -46,9 +46,12 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.naturewhispers.TestTags
+import com.example.naturewhispers.TestTags.BOTTOM_SHEET_PRESET
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.entities.Preset
 import com.example.naturewhispers.data.local.models.Audio
@@ -119,6 +122,7 @@ fun BottomSheetPreset(
         onDismissRequest = { onDismissStable() },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
+        modifier = modifier.testTag(BOTTOM_SHEET_PRESET)
 
         ) {
 
@@ -196,7 +200,9 @@ fun BottomSheetPreset(
                             )
                         } else
                             Icon(
-                                modifier = Modifier.size(40.dp),
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .testTag(TestTags.PLAY_PAUSE),
                                 imageVector = playPauseIcon,
                                 contentDescription = "Play / Pause"
                             )
