@@ -2,6 +2,8 @@ package com.example.naturewhispers.presentation.ui.mainScreen
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +32,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.naturewhispers.R
+import com.example.naturewhispers.data.di.TAG
+import com.example.naturewhispers.data.local.preferences.SettingsManager
+import com.example.naturewhispers.data.mediaPlayer.PlayerManager
 import com.example.naturewhispers.data.permission.NOTIFICATION_PERMISSION
 import com.example.naturewhispers.data.permission.PermissionDialog
 import com.example.naturewhispers.data.permission.ShowPermissionRationale
@@ -50,10 +56,19 @@ import com.example.naturewhispers.presentation.ui.mainScreen.components.StatsPan
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
-    sharedViewModel: SharedViewModel,
+    playerManager: PlayerManager,
     navigateTo: (route: String, params: List<Any>) -> Unit,
 ) {
+
     val navigateToStable: (route: String, params: List<Any>) -> Unit = remember { navigateTo }
+
+    val isSystemInDarkTheme = isSystemInDarkTheme()
+    LaunchedEffect(viewModel.darkTheme) {
+        if (isSystemInDarkTheme && viewModel.darkTheme?.isEmpty() == true){
+            viewModel.sendEvent(MainEvents.OnUpdateTheme(true))
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -75,8 +90,8 @@ fun MainScreen(
             modifier = Modifier,
             sendEvent = viewModel::sendEvent,
             uiState = viewModel.uiState.value,
-            playerState = sharedViewModel.state.value,
-            sendPlayerEvent = sharedViewModel::dispatchEvent,
+            playerState = playerManager.state.value,
+            sendPlayerEvent = playerManager::dispatchEvent,
             navigateTo = navigateToStable
         )
     }
@@ -96,7 +111,7 @@ fun Content(
     val sendPlayerEventStable: (PlayerEvents) -> Unit = remember { sendPlayerEvent }
 
     val activity = LocalContext.current as Activity
-    var showPermissionDialog by remember { mutableStateOf(false) }
+    /*var showPermissionDialog by remember { mutableStateOf(false) }
 
     if (!isPermissionGranted(activity, NOTIFICATION_PERMISSION))
         showPermissionDialog = true
@@ -107,7 +122,7 @@ fun Content(
         permission = NOTIFICATION_PERMISSION,
         description = stringResource(R.string.post_notifications_permission_description),
         permanentlyDeclinedDescription = stringResource(R.string.post_notifications_permanently_declined_description)
-    )
+    )*/
 
 
     if (uiState.isBottomSheetShown && uiState.currentPreset != null) {
@@ -115,7 +130,6 @@ fun Content(
             preset = uiState.currentPreset,
             onDismiss = {
                 sendPlayerEventStable(PlayerEvents.OnStopPlayer)
-                sendEventStable(MainEvents.OnPresetSelected(0))
                 sendEventStable(MainEvents.LogStat)
             },
             sendPlayerEvent = sendPlayerEventStable,

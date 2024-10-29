@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.naturewhispers.data.mediaPlayer.PlayerManager
 import com.example.naturewhispers.data.utils.formatSecondsToMMss
 import com.example.naturewhispers.data.utils.getDisplayNameFromUri
 import com.example.naturewhispers.data.utils.observeWithLifecycle
@@ -73,7 +74,7 @@ fun AddPresetScreen(
     navigateTo: (route: String, params: List<Any>) -> Unit,
     viewModel: AddPresetViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState,
-    sharedViewModel: SharedViewModel,
+    playerManager: PlayerManager,
 ) {
 
     viewModel.eventChannel.observeWithLifecycle {
@@ -89,8 +90,8 @@ fun AddPresetScreen(
             uiState.value,
             viewModel::sendEvent,
             navigateTo,
-            sharedViewModel::dispatchEvent,
-            sharedViewModel.state.value,
+            playerManager::dispatchEvent,
+            playerManager.state.value,
         )
     }
 

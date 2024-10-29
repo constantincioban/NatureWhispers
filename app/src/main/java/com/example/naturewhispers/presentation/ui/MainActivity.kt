@@ -20,6 +20,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +36,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.naturewhispers.R
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.foregroundService.PlayerService
+import com.example.naturewhispers.data.local.preferences.SettingsManager
+import com.example.naturewhispers.data.mediaPlayer.PlayerManager
 import com.example.naturewhispers.data.permission.NOTIFICATION_PERMISSION
 import com.example.naturewhispers.data.permission.PermissionDialog
 import com.example.naturewhispers.data.permission.isPermissionGranted
@@ -59,6 +62,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var store: Store<AppState>
+    @Inject
+    lateinit var playerManager: PlayerManager
+
     private val sharedViewModel: SharedViewModel by viewModels()
 
     @SuppressLint("WrongConstant")
@@ -80,9 +86,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
 
-            val darkTheme = store.state.map { it.darkTheme }.filterNot { it.isEmpty() }
-                .collectAsState(initial = isSystemInDarkTheme().toString())
-            NWCustomTheme(darkTheme = darkTheme.value == true.toString()) {
+
+            val darkTheme = store.state.map { it.darkTheme }.collectAsState(initial = "")
+
+            NWCustomTheme(darkTheme = if (darkTheme.value.isEmpty()) isSystemInDarkTheme() else darkTheme.value.toBoolean()) {
 
 
 
@@ -96,7 +103,6 @@ class MainActivity : ComponentActivity() {
                 val currentRoute by remember {
                     mutableStateOf(navBackStackEntry?.destination?.route )
                 }
-                Log.i(TAG, "onCreate: currentRoute = $currentRoute")
                 val navigationBarColor = MaterialTheme.colorScheme.surfaceVariant
                 val backgroundColor = MaterialTheme.colorScheme.background
                 Surface(
@@ -121,7 +127,7 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             snackbarHostState = snackbarHostState,
                             actions = actions,
-                            sharedViewModel = sharedViewModel,
+                            playerManager = playerManager,
                         )
 
                     }

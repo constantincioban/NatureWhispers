@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.naturewhispers.data.mediaPlayer.PlayerManager
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.Store
 import com.example.naturewhispers.presentation.ui.SharedViewModel
@@ -23,7 +24,7 @@ fun Navigation(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     actions: Actions,
-    sharedViewModel: SharedViewModel,
+    playerManager: PlayerManager,
     ) {
     val actions = remember(navController) { Actions(navController) }
 //    val storeState = store.state.collectAsState()
@@ -51,7 +52,7 @@ fun Navigation(
             route = Screens.Main.route,
         ) {
             MainScreen(
-                sharedViewModel = sharedViewModel,
+                playerManager = playerManager,
                 navigateTo = { route, params -> actions.navigateTo(route, params) },
             )
         }
@@ -64,7 +65,7 @@ fun Navigation(
                 presetId = backStackEntry.arguments?.getInt(Screens.Preset.presetIdArg) ?: 0,
                 navigateTo = { route, params -> actions.navigateTo(route, params) },
                 snackbarHostState = snackbarHostState,
-                sharedViewModel = sharedViewModel,
+                playerManager = playerManager,
             )
         }
 
