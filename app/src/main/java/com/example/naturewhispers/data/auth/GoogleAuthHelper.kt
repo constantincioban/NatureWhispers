@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import com.example.naturewhispers.BuildConfig
+//import com.example.naturewhispers.BuildConfig
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.local.models.User
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -35,10 +37,10 @@ class GoogleAuthHelper(private val context: Context) {
 
     suspend fun login(): User? {
         val hashedNonce = generateNonce()
-
+        val googleClientId = BuildConfig.GOOGLE_CLIENT_ID
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
-            .setServerClientId("188861013678-rvb2l1vm1v5tml3ld17dooibvke9a64q.apps.googleusercontent.com")
+            .setServerClientId(googleClientId)
             .setNonce(hashedNonce)
             .build()
 

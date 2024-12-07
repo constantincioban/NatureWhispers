@@ -25,6 +25,7 @@ android {
             useSupportLibrary = true
         }
 
+        buildConfigField("String", "GOOGLE_CLIENT_ID", "${properties["GOOGLE_CLIENT_ID"]}")
         buildConfigField("String", "STORAGE_URL", "${properties["STORAGE_URL"]}")
 
     }
