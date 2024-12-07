@@ -13,6 +13,6 @@ data class Preset(
     val title: String = "",
     val sound: String = "",
     val duration: Int = 0,
-    val userId: Int = 0,
+    val userId: String = "",
     val fileUri: String = "",
 )

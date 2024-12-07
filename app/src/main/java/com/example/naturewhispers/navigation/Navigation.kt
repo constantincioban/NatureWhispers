@@ -4,15 +4,11 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.naturewhispers.data.mediaPlayer.PlayerManager
-import com.example.naturewhispers.presentation.redux.AppState
-import com.example.naturewhispers.presentation.redux.Store
-import com.example.naturewhispers.presentation.ui.SharedViewModel
 import com.example.naturewhispers.presentation.ui.calendarScreen.CalendarScreen
 import com.example.naturewhispers.presentation.ui.mainScreen.MainScreen
 import com.example.naturewhispers.presentation.ui.addPresetScreen.AddPresetScreen
@@ -25,13 +21,15 @@ fun Navigation(
     snackbarHostState: SnackbarHostState,
     actions: Actions,
     playerManager: PlayerManager,
-    ) {
+    authPreferenceWasAsked: Boolean = false,
+) {
     val actions = remember(navController) { Actions(navController) }
 //    val storeState = store.state.collectAsState()
     val startDestination =
-//        if (storeState.value.isLoggedIn)
+        if (authPreferenceWasAsked)
             Screens.Main.route
-//    else Screens.Auth.route
+        else
+            Screens.Auth.route
 
     NavHost(
         navController = navController,
@@ -41,12 +39,13 @@ fun Navigation(
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None },
     ) {
-/*
         composable(
             route = Screens.Auth.route,
         ) {
-            AuthScreen(store = store)
-        }*/
+            AuthScreen(
+                navigateTo = { route, params -> actions.navigateAndClearStack(route, params) },
+            )
+        }
 
         composable(
             route = Screens.Main.route,
@@ -62,7 +61,7 @@ fun Navigation(
             arguments = Screens.AddPreset.arguments
         ) { backStackEntry ->
             AddPresetScreen(
-                presetId = backStackEntry.arguments?.getInt(Screens.Preset.presetIdArg) ?: 0,
+                presetId = backStackEntry.arguments?.getInt(Screens.AddPreset.presetIdArg) ?: 0,
                 navigateTo = { route, params -> actions.navigateTo(route, params) },
                 snackbarHostState = snackbarHostState,
                 playerManager = playerManager,
@@ -78,7 +77,10 @@ fun Navigation(
         composable(
             route = Screens.Profile.route
         ) {
-            ProfileScreen()
+            ProfileScreen(
+                snackbarHostState = snackbarHostState,
+                navigateAndClearStack = { route, params -> actions.navigateAndClearStack(route, params) },
+            )
         }
 
     }

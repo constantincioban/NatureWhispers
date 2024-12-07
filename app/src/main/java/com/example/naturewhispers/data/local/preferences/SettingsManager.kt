@@ -6,8 +6,18 @@ interface SettingsManager {
         const val DAILY_GOAL = "daily_goal"
         const val USERNAME = "username"
         const val PROFILE_PIC_URI = "profile_pic_uri"
-        const val DARK_THEME = ""
+        const val DARK_THEME = "dark_theme"
+        const val USER_EMAIL = "user_email"
+        const val AUTH_PREF = "auth_preference"
     }
+
+    enum class AuthPreference {
+        USER, GUEST, NONE
+    }
+
+    suspend fun saveUserDetails(email: String, authPreference: AuthPreference)
+
+    suspend fun getUserDetails(): Pair<String, AuthPreference>
 
     suspend fun saveIntSetting(key: String, value: Int)
 

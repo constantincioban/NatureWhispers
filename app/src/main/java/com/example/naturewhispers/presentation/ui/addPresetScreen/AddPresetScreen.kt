@@ -53,15 +53,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.naturewhispers.data.mediaPlayer.PlayerEvents
 import com.example.naturewhispers.data.mediaPlayer.PlayerManager
+import com.example.naturewhispers.data.mediaPlayer.PlayerState
 import com.example.naturewhispers.data.utils.formatSecondsToMMss
 import com.example.naturewhispers.data.utils.getDisplayNameFromUri
 import com.example.naturewhispers.data.utils.observeWithLifecycle
 import com.example.naturewhispers.navigation.Screens
 import com.example.naturewhispers.presentation.redux.ContentType
-import com.example.naturewhispers.presentation.ui.PlayerEvents
-import com.example.naturewhispers.presentation.ui.PlayerState
-import com.example.naturewhispers.presentation.ui.SharedViewModel
 import com.example.naturewhispers.presentation.ui.addPresetScreen.components.DeleteDialog
 import com.example.naturewhispers.presentation.ui.addPresetScreen.components.SoundsListDialogContent
 import com.example.naturewhispers.presentation.ui.mainScreen.components.RoundedIcon
@@ -113,7 +112,7 @@ fun Content(
     val sendPlayerEventStable: (PlayerEvents) -> Unit = remember { sendPlayerEvent }
 
     val presetId by remember(uiState.presetId) {
-        derivedStateOf {uiState.presetId}
+        derivedStateOf { uiState.presetId }
     }
 
     LaunchedEffect(key1 = uiState.presetAddedSuccessfully) {
@@ -130,12 +129,24 @@ fun Content(
             sendEventStable(AddPresetEvents.OnUpdateChosenPreliminarySound(audioFileName))
             sendEventStable(AddPresetEvents.OnChosenSoundChanged)
             sendEventStable(AddPresetEvents.OnUpdateFileUri(uri.toString()))
-            sendEventStable(AddPresetEvents.OnUpdateMaxDuration(getAudioFileDuration(uri.toString(), context) / 1000f))
+            sendEventStable(
+                AddPresetEvents.OnUpdateMaxDuration(
+                    getAudioFileDuration(
+                        uri.toString(),
+                        context
+                    ) / 1000f
+                )
+            )
         }
     )
 
     if (uiState.showSoundListDialog)
-        SoundsListDialogContent(sendEventStable, sendPlayerEventStable, state = uiState, playerState)
+        SoundsListDialogContent(
+            sendEventStable,
+            sendPlayerEventStable,
+            state = uiState,
+            playerState
+        )
 
     if (uiState.showDeleteDialog)
         DeleteDialog(sendEvent = sendEventStable, state = uiState, navigateTo = navigateToStable)
@@ -152,7 +163,9 @@ fun Content(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RoundedIcon(icon = Icons.Rounded.ArrowBackIosNew, onClick = {navigateTo(Screens.Main.route, listOf())})
+            RoundedIcon(
+                icon = Icons.Rounded.ArrowBackIosNew,
+                onClick = { navigateTo(Screens.Main.route, listOf()) })
             Text(text = "Add Preset", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             RoundedIcon(
                 icon = Icons.Rounded.DeleteForever,
@@ -163,9 +176,10 @@ fun Content(
             )
 
         }
-        Column(Modifier
-            .padding(horizontal = 30.dp),
-) {
+        Column(
+            Modifier
+                .padding(horizontal = 30.dp),
+        ) {
             Spacer(modifier = Modifier.height(50.dp))
             Text(
                 text = "Preset's title",
@@ -226,10 +240,16 @@ fun Content(
             ) {
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(0.6f),
-                    value = uiState.chosenSound, placeholder = {
-                        Text(text = "Pick your sound", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }, onValueChange = {}, enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    value = uiState.chosenSound,
+                    placeholder = {
+                        Text(
+                            text = "Pick your sound",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    onValueChange = {}, enabled = false,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                 )
@@ -281,7 +301,6 @@ fun Content(
                 }
             }
         }
-
 
 
     }

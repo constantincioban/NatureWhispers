@@ -41,8 +41,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.naturewhispers.data.di.TAG
-import com.example.naturewhispers.presentation.ui.PlayerEvents
-import com.example.naturewhispers.presentation.ui.PlayerState
+import com.example.naturewhispers.data.mediaPlayer.PlayerEvents
+import com.example.naturewhispers.data.mediaPlayer.PlayerState
 import com.example.naturewhispers.presentation.ui.addPresetScreen.AddPresetEvents
 import com.example.naturewhispers.presentation.ui.addPresetScreen.AddPresetState
 import com.example.naturewhispers.presentation.ui.theme.NatureWhispersTheme

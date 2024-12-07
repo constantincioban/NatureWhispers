@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.naturewhispers.data.local.predefined.LocalData
-import com.example.naturewhispers.presentation.ui.PlayerEvents
-import com.example.naturewhispers.presentation.ui.PlayerState
+import com.example.naturewhispers.data.mediaPlayer.PlayerEvents
+import com.example.naturewhispers.data.mediaPlayer.PlayerState
 import com.example.naturewhispers.presentation.ui.addPresetScreen.AddPresetEvents
 import com.example.naturewhispers.presentation.ui.addPresetScreen.AddPresetState
 

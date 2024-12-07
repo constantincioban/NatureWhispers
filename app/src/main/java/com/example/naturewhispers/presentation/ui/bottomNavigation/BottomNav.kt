@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
@@ -20,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,18 +26,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.utils.ImmutableList
 import com.example.naturewhispers.navigation.Screens
-import com.example.naturewhispers.presentation.redux.AppState
-import com.example.naturewhispers.presentation.redux.Store
-import com.example.naturewhispers.presentation.ui.theme.GrayLighter
-import kotlinx.coroutines.launch
 
 @Composable
 fun BottomBar(
@@ -94,6 +83,8 @@ fun AddItem(
             .clip(CircleShape)
             .background(background)
             .clickable {
+                if (selected) return@clickable
+
                 navigateTo(screen.route, listOf())
                 updateSelected(screen)
             }

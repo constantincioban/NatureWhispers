@@ -47,7 +47,7 @@ class AddPresetViewModel @Inject constructor(
 
     init {
 
-        savedStateHandle.get<Int>(Screens.Preset.presetIdArg)?.let { presetId ->
+        savedStateHandle.get<Int>(Screens.AddPreset.presetIdArg)?.let { presetId ->
             if (presetId == 0) return@let
 
             viewModelScope.launch {
@@ -164,7 +164,7 @@ class AddPresetViewModel @Inject constructor(
                 title = state.value.title,
                 sound = state.value.chosenSound,
                 duration = state.value.duration.toInt() * 60,
-                userId = 0,
+                userId = store.state.value.userEmail,
                 fileUri = state.value.fileUri
             )
         )

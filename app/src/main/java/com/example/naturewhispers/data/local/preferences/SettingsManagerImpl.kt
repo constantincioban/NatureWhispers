@@ -9,7 +9,13 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.naturewhispers.data.local.preferences.SettingsManager.AuthPreference
+import com.example.naturewhispers.data.local.preferences.SettingsManager.Companion.AUTH_PREF
+import com.example.naturewhispers.data.local.preferences.SettingsManager.Companion.USER_EMAIL
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class SettingsManagerImpl(
     private val context: Context
@@ -17,6 +23,18 @@ class SettingsManagerImpl(
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
+    override suspend fun saveUserDetails(email: String, authPreference: AuthPreference) {
+        saveStringSetting(USER_EMAIL, email)
+        saveStringSetting(AUTH_PREF, authPreference.name)
+    }
+
+    override suspend fun getUserDetails(): Pair<String, AuthPreference> {
+        val email = readStringSetting(USER_EMAIL)
+        val authPreference = readStringSetting(AUTH_PREF).let {
+            AuthPreference.valueOf(it.ifEmpty { AuthPreference.NONE.name }.uppercase())
+        }
+        return Pair(email, authPreference)
+    }
 
     override suspend fun saveIntSetting(key: String, value: Int) {
         val dataStoreKey = intPreferencesKey(key)

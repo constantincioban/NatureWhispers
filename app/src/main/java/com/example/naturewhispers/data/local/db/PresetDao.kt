@@ -2,6 +2,8 @@ package com.example.naturewhispers.data.local.db
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import com.example.naturewhispers.data.entities.Preset
@@ -24,4 +26,7 @@ interface PresetDao {
 
     @Delete
     suspend fun deletePreset(preset: Preset)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertPresets(presets: List<Preset>)
 }

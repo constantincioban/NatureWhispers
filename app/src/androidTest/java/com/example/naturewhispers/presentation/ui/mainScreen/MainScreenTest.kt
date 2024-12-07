@@ -81,7 +81,7 @@ class MainScreenTest {
     @Test
     fun clickOnPresetItem_OpensBottomSheet() {
         composeRule.onNodeWithTag(TestTags.BOTTOM_SHEET_PRESET).assertDoesNotExist()
-        composeRule.onAllNodesWithTag("PresetCard")
+        composeRule.onAllNodesWithTag(TestTags.PRESET_CARD)
             .onFirst()  // Selects the first node in the list
             .performClick()
         composeRule.onNodeWithTag(TestTags.BOTTOM_SHEET_PRESET).assertIsDisplayed()
@@ -89,17 +89,16 @@ class MainScreenTest {
 
     @Test
     fun openBottomSheet_PlayerIsNotPlaying() {
-        composeRule.onAllNodesWithTag("PresetCard")
+        composeRule.onAllNodesWithTag(TestTags.PRESET_CARD)
             .onFirst()  // Selects the first node in the list
             .performClick()
         Truth.assertThat(playerManager.state.value.isPlaying).isFalse()
     }
 
 
-
     @Test
     fun openBottomSheet_clickOnPlay_PlayerIsPlaying() = runTest {
-        composeRule.onAllNodesWithTag("PresetCard")
+        composeRule.onAllNodesWithTag(TestTags.PRESET_CARD)
             .onFirst()  // Selects the first node in the list
             .performClick()
         composeRule.waitUntil(timeoutMillis = 20_000) {
@@ -112,7 +111,7 @@ class MainScreenTest {
 
     @Test
     fun openBottomSheet_clickOnPlayClickOnPauseClickOnPlay_PlayerIsPlaying() = runTest {
-        composeRule.onAllNodesWithTag("PresetCard")
+        composeRule.onAllNodesWithTag(TestTags.PRESET_CARD)
             .onFirst()  // Selects the first node in the list
             .performClick()
         composeRule.waitUntil(timeoutMillis = 20_000) {
@@ -146,7 +145,7 @@ class MainScreenTest {
         composeRule.waitUntil(timeoutMillis = 20_000) {
             composeRule.onNodeWithTag(TestTags.BOTTOM_SHEET_PRESET).isNotDisplayed()
         }
-        composeRule.onAllNodesWithTag("PresetCard")
+        composeRule.onAllNodesWithTag(TestTags.PRESET_CARD)
             .onLast()  // Selects the first node in the list
             .performClick()
         composeRule.awaitIdle()

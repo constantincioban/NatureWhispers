@@ -34,7 +34,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.naturewhispers.R
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.local.preferences.SettingsManager
+import com.example.naturewhispers.data.mediaPlayer.PlayerEvents
 import com.example.naturewhispers.data.mediaPlayer.PlayerManager
+import com.example.naturewhispers.data.mediaPlayer.PlayerState
 import com.example.naturewhispers.data.permission.NOTIFICATION_PERMISSION
 import com.example.naturewhispers.data.permission.PermissionDialog
 import com.example.naturewhispers.data.permission.ShowPermissionRationale
@@ -42,9 +44,6 @@ import com.example.naturewhispers.data.permission.isPermissionGranted
 import com.example.naturewhispers.data.permission.permissionLauncher
 import com.example.naturewhispers.data.utils.openAppSettings
 import com.example.naturewhispers.navigation.Screens
-import com.example.naturewhispers.presentation.ui.PlayerEvents
-import com.example.naturewhispers.presentation.ui.PlayerState
-import com.example.naturewhispers.presentation.ui.SharedViewModel
 import com.example.naturewhispers.presentation.ui.mainScreen.components.BarChartComponent
 import com.example.naturewhispers.presentation.ui.mainScreen.components.BottomSheetPreset
 import com.example.naturewhispers.presentation.ui.mainScreen.components.Greeting
@@ -111,7 +110,7 @@ fun Content(
     val sendPlayerEventStable: (PlayerEvents) -> Unit = remember { sendPlayerEvent }
 
     val activity = LocalContext.current as Activity
-    /*var showPermissionDialog by remember { mutableStateOf(false) }
+    var showPermissionDialog by remember { mutableStateOf(false) }
 
     if (!isPermissionGranted(activity, NOTIFICATION_PERMISSION))
         showPermissionDialog = true
@@ -122,7 +121,7 @@ fun Content(
         permission = NOTIFICATION_PERMISSION,
         description = stringResource(R.string.post_notifications_permission_description),
         permanentlyDeclinedDescription = stringResource(R.string.post_notifications_permanently_declined_description)
-    )*/
+    )
 
 
     if (uiState.isBottomSheetShown && uiState.currentPreset != null) {
@@ -131,6 +130,7 @@ fun Content(
             onDismiss = {
                 sendPlayerEventStable(PlayerEvents.OnStopPlayer)
                 sendEventStable(MainEvents.LogStat)
+                sendEventStable(MainEvents.OnPresetSelected(-1))
             },
             sendPlayerEvent = sendPlayerEventStable,
             sendEvent = sendEventStable,

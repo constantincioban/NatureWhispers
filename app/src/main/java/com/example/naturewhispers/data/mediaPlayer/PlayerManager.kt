@@ -5,8 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import com.example.naturewhispers.data.local.models.Audio
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.Store
-import com.example.naturewhispers.presentation.ui.PlayerEvents
-import com.example.naturewhispers.presentation.ui.PlayerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

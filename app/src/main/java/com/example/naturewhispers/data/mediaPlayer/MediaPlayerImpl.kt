@@ -13,7 +13,7 @@ import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.local.models.Audio
 import com.example.naturewhispers.data.local.predefined.LocalData
 import com.example.naturewhispers.data.mediaPlayer.IMediaPlayer
-import com.example.naturewhispers.presentation.ui.PlayerState
+import com.example.naturewhispers.data.mediaPlayer.PlayerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +33,8 @@ class MediaPlayerImpl @Inject constructor(
 ) : IMediaPlayer, Player.Listener {
 
     override var state = MutableStateFlow(
+
+
         PlayerState(
             isPlaying = player.isPlaying,
             duration = player.duration / 1000,

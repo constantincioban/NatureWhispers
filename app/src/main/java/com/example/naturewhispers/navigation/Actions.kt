@@ -15,22 +15,10 @@ sealed class Screens(
     val title: String,
     val icon: ImageVector? = null
 ) {
-    data object Auth: Screens("auth_screen", "Auth")
+    data object Auth: Screens("auth_screen", "Auth", null)
     data object Main: Screens("main_screen", "Main", Icons.Rounded.Home)
     data object Calendar: Screens("calendar_screen", "Calendar", Icons.Rounded.DateRange)
     data object Profile: Screens("profile_screen", "Profile", Icons.Rounded.PersonOutline)
-    data object Preset: Screens("preset_screen", "Preset") {
-        const val presetIdArg = "presetId"
-        const val presetTitleArg = "presetTitle"
-        val routeWithArgs = "$route/{$presetIdArg}{$presetTitleArg}"
-        val arguments = listOf(
-            navArgument(presetIdArg) { type = NavType.IntType },
-            navArgument(presetTitleArg) { type = NavType.StringType }
-        )
-
-        fun uri(presetId: Int = 0, presetTitle: String = "No title found") = "$route/$presetId$presetTitle"
-
-    }
     data object AddPreset : Screens("add_preset_screen", "Add preset") {
         const val presetIdArg = "presetId"
         val routeWithArgs = "$route/{$presetIdArg}"
@@ -42,9 +30,9 @@ sealed class Screens(
     }
 
     companion object {
-        val all = listOf(
-            Main, AddPreset, Calendar, Profile
-        )
+        val all by lazy {   listOf(
+            Main, AddPreset, Calendar, Profile, Auth
+        )}
     }
 }
 
@@ -67,17 +55,13 @@ class Actions(private val navController: NavHostController) {
         }
     }
 
-
-    val navigateToPreset: (Int, String) -> Unit = { id, title ->
-        navController.navigate(Screens.Preset.uri(id, title))
-    }
-    val navigateToAddPreset: (Int) -> Unit = {
-        navController.navigate(Screens.AddPreset.uri(it))
-    }
-    val navigateBack: () -> Unit = {
-        navController.popBackStack()
-    }
-    val navigateToMain: () -> Unit = {
-        navController.navigate(Screens.Main.route)
+    fun navigateAndClearStack(route: String, params: List<Any>) {
+        if (route.isNotEmpty()) {
+            val uri = route + params.toNavigationPath()
+            navController.navigate(uri) {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
     }
 }

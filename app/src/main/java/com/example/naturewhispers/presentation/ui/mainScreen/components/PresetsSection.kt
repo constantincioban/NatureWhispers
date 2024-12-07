@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,21 +36,18 @@ fun PresetsSection(presets: ImmutableList<Preset>, toggleBottomSheet: (Int) -> U
             Text(text = "No presets")
         }
     else
-        Row(
+        LazyRow(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
 
             ) {
-
-            presets.forEach { preset ->
-                SquareCard(item = preset, onClick = { id ->
-                    toggleBottomSheet(id)
-                })
-                Spacer(modifier = Modifier.width(10.dp))
-            }
-
+                items(presets, key = { it.id }) { preset ->
+                    SquareCard(item = preset, onClick = { id ->
+                        toggleBottomSheet(id)
+                    })
+                    Spacer(modifier = Modifier.width(10.dp))
+                }
         }
 }

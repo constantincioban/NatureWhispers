@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +39,7 @@ import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.util.DebugLogger
+import com.example.naturewhispers.TestTags
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.utils.getCurrentDate
 import com.example.naturewhispers.presentation.redux.ContentType
@@ -70,7 +72,8 @@ fun Greeting(
     Row(
         modifier = modifier
             .wrapContentHeight()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 20.dp)
+            .testTag(TestTags.GREETING_CARD),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {

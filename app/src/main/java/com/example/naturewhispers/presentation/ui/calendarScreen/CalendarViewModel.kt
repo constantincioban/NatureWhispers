@@ -30,6 +30,7 @@ import kotlin.system.measureTimeMillis
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
     statDao: StatDao,
+    private val store: Store<AppState>,
 ): ViewModel() {
 
     private val _state = mutableStateOf(CalendarState())
@@ -39,7 +40,7 @@ class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             statDao.getStats().collectLatest {
                     _state.value = _state.value.copy(
-                            stats = ImmutableList(it)
+                            stats = ImmutableList(it.filter { it.userId == store.state.value.userEmail })
                         )
                 }
         }

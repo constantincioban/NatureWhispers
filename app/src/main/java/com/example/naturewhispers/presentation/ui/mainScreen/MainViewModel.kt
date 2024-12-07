@@ -52,7 +52,7 @@ class MainViewModel @Inject constructor(
                 settingsManager.readStringSetting(SettingsManager.USERNAME).trim().ifEmpty { "Anonymous" }
 
             val dailyGoal =
-                settingsManager.readIntSetting(SettingsManager.DAILY_GOAL).toString().ifEmpty { "1" }
+                settingsManager.readIntSetting(SettingsManager.DAILY_GOAL).toString().map { i -> if (i == '0') '1' else i }.joinToString("")
 
             val profilePicUri =
                 settingsManager.readStringSetting(SettingsManager.PROFILE_PIC_URI)
@@ -79,16 +79,20 @@ class MainViewModel @Inject constructor(
         }
         viewModelScope.launch {
             presetDao.getPresets().collectLatest {
-                state.value = state.value.copy(presets = ImmutableList(it.reversed()))
-                store.update { appState -> appState.copy(presets = it.reversed()) }
+                val presetsFilteredByUser = it.filter { it.userId == store.state.value.userEmail }
+                state.value = state.value.copy(presets = ImmutableList(
+                    presetsFilteredByUser.reversed()
+                ))
+                store.update { appState -> appState.copy(presets = presetsFilteredByUser.reversed()) }
             }
         }
         viewModelScope.launch {
             statDao.getStats().collectLatest {
+                val statsFilteredByUser = it.filter { it.userId == store.state.value.userEmail }
                 state.value = state.value.copy(
-                    todaysTime = calculateTodaysTime(it),
-                    streak = calculateStreak(it),
-                    stats = ImmutableList(it)
+                    todaysTime = calculateTodaysTime(statsFilteredByUser),
+                    streak = calculateStreak(statsFilteredByUser),
+                    stats = ImmutableList(statsFilteredByUser)
                 )
             }
         }
@@ -167,12 +171,13 @@ class MainViewModel @Inject constructor(
                     date = System.currentTimeMillis(),
                     presetTitle = state.value.currentPreset?.title ?: "Unknown",
                     presetId = state.value.currentPreset?.id ?: 0,
+                    userId = store.state.value.userEmail,
                     currentGoal = store.state.value.dailyGoal.ifEmpty { "1" }.toInt()
                 )
             )
         }
         startTimestamp = 0L
-        state.value = state.value.copy(preliminaryDuration = 0L, currentPreset = null)
+        state.value = state.value.copy(preliminaryDuration = 0L)
     }
 
     private fun updateCurrentPreset(id: Int) {

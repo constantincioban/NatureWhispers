@@ -55,10 +55,10 @@ import com.example.naturewhispers.TestTags.BOTTOM_SHEET_PRESET
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.entities.Preset
 import com.example.naturewhispers.data.local.models.Audio
+import com.example.naturewhispers.data.mediaPlayer.PlayerEvents
+import com.example.naturewhispers.data.mediaPlayer.PlayerState
 import com.example.naturewhispers.data.utils.formatDuration
 import com.example.naturewhispers.data.utils.formatDurationFromMillis
-import com.example.naturewhispers.presentation.ui.PlayerEvents
-import com.example.naturewhispers.presentation.ui.PlayerState
 import com.example.naturewhispers.presentation.ui.mainScreen.MainEvents
 import com.linc.audiowaveform.AudioWaveform
 

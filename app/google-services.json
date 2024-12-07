@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "281965253126",
+    "project_id": "naturewhispers-e8db8",
+    "storage_bucket": "naturewhispers-e8db8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:281965253126:android:73246ace1ad7c1a125e987",
+        "android_client_info": {
+          "package_name": "com.example.naturewhispers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDInxXSBBfagYaOd7MiZeLfJPTrELgHXko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

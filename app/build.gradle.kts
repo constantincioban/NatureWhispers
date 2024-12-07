@@ -5,7 +5,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
-
+    id("com.google.gms.google-services")
+    id("kotlinx-serialization")
 }
 
 android {
@@ -83,6 +84,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.play.services.base)
     implementation(libs.play.services.auth)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -175,6 +177,9 @@ dependencies {
     androidTestImplementation("androidx.test:core-ktx:1.4.0")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.1")
     androidTestImplementation("androidx.test:runner:1.4.0")
+    implementation(kotlin("reflect"))
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 }
 
 kapt {

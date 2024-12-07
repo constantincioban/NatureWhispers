@@ -12,6 +12,8 @@ data class AppState(
     val darkTheme: String = "",
     val isPlaying: Boolean = false,
     val contentType: ContentType? = null,
+    val isLoggedIn: Boolean = false,
+    val userEmail: String = "",
 )
 
 enum class ContentType {
