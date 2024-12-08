@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.naturewhispers.data.auth.GoogleAuthHelper
+import com.example.naturewhispers.data.auth.IAuthHelper
 import com.example.naturewhispers.data.entities.Preset
 import com.example.naturewhispers.data.entities.Stat
 import com.example.naturewhispers.data.firebase.CollectionPath
@@ -31,7 +32,7 @@ class ProfileViewModel @Inject constructor(
     private val firestoreHelper: IFirestoreHelper,
     private val presetDao: PresetDao,
     private val statDao: StatDao,
-    private val googleAuthHelper: GoogleAuthHelper,
+    private val googleAuthHelper: IAuthHelper,
 ): ViewModel() {
 
 

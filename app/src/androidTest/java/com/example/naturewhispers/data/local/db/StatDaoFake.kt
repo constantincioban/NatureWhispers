@@ -118,4 +118,10 @@ class StatDaoFake : StatDao {
         emit(stats.filter { it.presetId == presetId })
     }
 
+    override suspend fun insertStats(stats: List<Stat>) {
+        stats.forEach {
+            upsertStat(it)
+        }
+    }
+
 }

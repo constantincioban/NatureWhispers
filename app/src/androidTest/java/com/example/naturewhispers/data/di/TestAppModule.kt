@@ -3,7 +3,11 @@ package com.example.naturewhispers.data.di
 import MediaPlayerImpl
 import android.app.Application
 import androidx.room.Room
+import com.example.naturewhispers.data.auth.GoogleAuthHelper
+import com.example.naturewhispers.data.auth.IAuthHelper
 import com.example.naturewhispers.data.entities.Preset
+import com.example.naturewhispers.data.firebase.FirestoreHelper
+import com.example.naturewhispers.data.firebase.IFirestoreHelper
 import com.example.naturewhispers.data.local.db.NWDatabase
 import com.example.naturewhispers.data.local.db.PresetDao
 import com.example.naturewhispers.data.local.db.PresetDaoFake
@@ -24,6 +28,19 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class TestAppModule {
+
+    @Provides
+    @Singleton
+    fun provideGoogleAuthHelper(app: Application): IAuthHelper {
+        return GoogleAuthHelper(app)
+
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirestoreHelper(): IFirestoreHelper {
+        return FirestoreHelper()
+    }
 
     @Provides
     @Singleton

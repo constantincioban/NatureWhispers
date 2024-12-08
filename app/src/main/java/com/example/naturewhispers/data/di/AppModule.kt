@@ -4,6 +4,7 @@ import MediaPlayerImpl
 import android.app.Application
 import androidx.room.Room
 import com.example.naturewhispers.data.auth.GoogleAuthHelper
+import com.example.naturewhispers.data.auth.IAuthHelper
 import com.example.naturewhispers.data.firebase.FirestoreHelper
 import com.example.naturewhispers.data.firebase.IFirestoreHelper
 import com.example.naturewhispers.data.local.db.NWDatabase
@@ -24,10 +25,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
-
     @Provides
     @Singleton
-    fun provideGoogleAuthHelper(app: Application): GoogleAuthHelper {
+    fun provideGoogleAuthHelper(app: Application): IAuthHelper {
         return GoogleAuthHelper(app)
     }
 

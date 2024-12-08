@@ -30,7 +30,6 @@ import com.example.naturewhispers.navigation.Screens
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.Store
 import com.example.naturewhispers.presentation.ui.MainActivity
-import com.example.naturewhispers.presentation.ui.SharedViewModel
 import com.example.naturewhispers.presentation.ui.theme.NatureWhispersTheme
 import com.google.common.truth.Truth
 import dagger.hilt.android.testing.HiltAndroidRule

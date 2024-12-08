@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import java.security.MessageDigest
 import java.util.*
 
-class GoogleAuthHelper(private val context: Context) {
+class GoogleAuthHelper(private val context: Context): IAuthHelper {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -35,7 +35,7 @@ class GoogleAuthHelper(private val context: Context) {
         return digest.fold("") { str, it -> str + "%02x".format(it) }
     }
 
-    suspend fun login(): User? {
+    override suspend fun login(): User? {
         val hashedNonce = generateNonce()
         val googleClientId = BuildConfig.GOOGLE_CLIENT_ID
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
@@ -77,7 +77,7 @@ class GoogleAuthHelper(private val context: Context) {
         return result.await()
     }
 
-    fun logout() {
+    override fun logout() {
         coroutineScope.launch {
             try {
                 // Clear stored credentials for the user

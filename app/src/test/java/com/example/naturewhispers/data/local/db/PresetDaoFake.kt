@@ -25,4 +25,10 @@ class PresetDaoFake: PresetDao {
     override suspend fun deletePreset(preset: Preset) {
         presets.remove(preset)
     }
+
+    override suspend fun insertPresets(presets: List<Preset>) {
+        presets.forEach {
+            upsertPreset(it)
+        }
+    }
 }

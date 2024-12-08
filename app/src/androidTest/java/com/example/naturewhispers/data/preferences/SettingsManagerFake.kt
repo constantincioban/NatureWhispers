@@ -10,6 +10,17 @@ class SettingsManagerFake: SettingsManager {
     private val stringsMap = mutableMapOf<String, String>()
     private val stringListsMap = mutableMapOf<String, List<String>>()
 
+    override suspend fun saveUserDetails(
+        email: String,
+        authPreference: SettingsManager.AuthPreference
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getUserDetails(): Pair<String, SettingsManager.AuthPreference> {
+        TODO("Not yet implemented")
+    }
+
 
     override suspend fun saveIntSetting(key: String, value: Int) {
         integersMap[key] = value

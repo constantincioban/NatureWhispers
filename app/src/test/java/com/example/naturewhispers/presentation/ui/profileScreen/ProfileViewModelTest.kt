@@ -1,6 +1,12 @@
 package com.example.naturewhispers.presentation.ui.profileScreen
 
 import com.example.naturewhispers.MainDispatcherRule
+import com.example.naturewhispers.data.auth.GoogleAuthHelper
+import com.example.naturewhispers.data.auth.IAuthHelper
+import com.example.naturewhispers.data.firebase.FirestoreHelper
+import com.example.naturewhispers.data.firebase.IFirestoreHelper
+import com.example.naturewhispers.data.local.db.PresetDao
+import com.example.naturewhispers.data.local.db.StatDao
 import com.example.naturewhispers.data.local.preferences.SettingsManager
 import com.example.naturewhispers.data.preferences.SettingsManagerFake
 import com.example.naturewhispers.presentation.redux.AppState
@@ -23,12 +29,16 @@ class ProfileViewModelTest {
     private lateinit var viewModel: ProfileViewModel
     private lateinit var store: Store<AppState>
     private lateinit var settingsManager: SettingsManager
+    private lateinit var firestoreHelper: IFirestoreHelper
+    private lateinit var presetDao: PresetDao
+    private lateinit var statDao: StatDao
+    private lateinit var googleAuthHelper: IAuthHelper
 
     @Before
     fun setUp() {
         store = Store(AppState())
         settingsManager = SettingsManagerFake()
-        viewModel = ProfileViewModel(settingsManager, store)
+        viewModel = ProfileViewModel(settingsManager, store, firestoreHelper, presetDao, statDao, googleAuthHelper)
 
     }
 
@@ -38,7 +48,7 @@ class ProfileViewModelTest {
         val dailyGoal = "10"
         val darkTheme = true
         store.update { it.copy(username = username, dailyGoal = dailyGoal, darkTheme = darkTheme.toString()) }
-        viewModel = ProfileViewModel(settingsManager, store)
+        viewModel = ProfileViewModel(settingsManager, store, firestoreHelper, presetDao, statDao, googleAuthHelper)
         assertThat(viewModel.uiState.value.username).isEqualTo(username)
         assertThat(viewModel.uiState.value.dailyGoal).isEqualTo(dailyGoal)
         assertThat(viewModel.uiState.value.darkTheme).isEqualTo(darkTheme)

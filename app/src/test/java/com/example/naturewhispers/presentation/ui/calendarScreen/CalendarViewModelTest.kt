@@ -5,6 +5,8 @@ import com.example.naturewhispers.MainDispatcherRule
 import com.example.naturewhispers.data.entities.Stat
 import com.example.naturewhispers.data.local.db.StatDao
 import com.example.naturewhispers.data.local.db.StatDaoFake
+import com.example.naturewhispers.presentation.redux.AppState
+import com.example.naturewhispers.presentation.redux.Store
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -22,11 +24,12 @@ class CalendarViewModelTest{
 
     private lateinit var viewModel: CalendarViewModel
     private lateinit var statDao: StatDao
+    private lateinit var store: Store<AppState>
 
     @Before
     fun setUp() {
         statDao = StatDaoFake()
-        viewModel = CalendarViewModel(statDao)
+        viewModel = CalendarViewModel(statDao, store)
     }
 
     @Test
@@ -45,7 +48,7 @@ class CalendarViewModelTest{
             cancelAndConsumeRemainingEvents()
         }
 
-        viewModel = CalendarViewModel(statDao)
+        viewModel = CalendarViewModel(statDao, store)
         assertThat(viewModel.uiState.value.stats).isEqualTo(stats)
 
     }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.naturewhispers.data.auth.GoogleAuthHelper
+import com.example.naturewhispers.data.auth.IAuthHelper
 import com.example.naturewhispers.data.local.preferences.SettingsManager
 import com.example.naturewhispers.data.local.preferences.SettingsManager.AuthPreference
 import com.example.naturewhispers.presentation.redux.AppState
@@ -17,7 +18,7 @@ import kotlin.math.log
 class AuthViewModel @Inject constructor(
     private val store: Store<AppState>,
     private val settingsManager: SettingsManager,
-    private val googleAuthHelper: GoogleAuthHelper,
+    private val googleAuthHelper: IAuthHelper,
 
 ) : ViewModel() {
 
