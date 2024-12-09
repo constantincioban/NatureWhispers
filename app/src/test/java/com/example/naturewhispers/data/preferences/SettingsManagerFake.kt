@@ -14,11 +14,16 @@ class SettingsManagerFake: SettingsManager {
         email: String,
         authPreference: SettingsManager.AuthPreference
     ) {
-        TODO("Not yet implemented")
+        saveStringSetting(SettingsManager.USER_EMAIL, email)
+        saveStringSetting(SettingsManager.AUTH_PREF, authPreference.name)
     }
 
     override suspend fun getUserDetails(): Pair<String, SettingsManager.AuthPreference> {
-        TODO("Not yet implemented")
+        val email = readStringSetting(SettingsManager.USER_EMAIL)
+        val authPreference = readStringSetting(SettingsManager.AUTH_PREF).let {
+            SettingsManager.AuthPreference.valueOf(it.ifEmpty { SettingsManager.AuthPreference.NONE.name }.uppercase())
+        }
+        return Pair(email, authPreference)
     }
 
 

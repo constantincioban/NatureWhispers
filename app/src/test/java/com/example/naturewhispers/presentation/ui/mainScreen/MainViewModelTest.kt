@@ -80,8 +80,8 @@ class MainViewModelTest {
         settingsManager.saveStringSetting(SettingsManager.PROFILE_PIC_URI, profilePicUri)
         settingsManager.saveIntSetting(SettingsManager.DAILY_GOAL, dailyGoal)
 
-
         viewModel = MainViewModel(presetDao, statDao, settingsManager, store)
+
         assertThat(store.state.value.username).isEqualTo(username)
         assertThat(store.state.value.dailyGoal).isEqualTo(dailyGoal.toString())
         assertThat(store.state.value.profilePicUri).isEqualTo(profilePicUri)

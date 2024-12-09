@@ -1,17 +1,10 @@
 package com.example.naturewhispers.data.firebase
 
-import android.util.Log
-import com.example.naturewhispers.data.di.TAG
-import com.example.naturewhispers.data.entities.Preset
-import com.example.naturewhispers.data.entities.Stat
+import com.example.naturewhispers.data.firebase.IFirestoreHelper.Response
 import com.google.firebase.Firebase
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.gson.Gson
 import kotlinx.coroutines.tasks.await
-import kotlin.reflect.KClass
-import com.example.naturewhispers.data.firebase.IFirestoreHelper.Response
 
 class FirestoreHelper: IFirestoreHelper {
 

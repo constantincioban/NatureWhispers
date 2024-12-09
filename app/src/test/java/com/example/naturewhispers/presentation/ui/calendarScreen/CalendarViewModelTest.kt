@@ -29,6 +29,7 @@ class CalendarViewModelTest{
     @Before
     fun setUp() {
         statDao = StatDaoFake()
+        store = Store(AppState())
         viewModel = CalendarViewModel(statDao, store)
     }
 

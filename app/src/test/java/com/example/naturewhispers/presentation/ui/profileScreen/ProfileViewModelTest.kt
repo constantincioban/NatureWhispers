@@ -1,12 +1,18 @@
 package com.example.naturewhispers.presentation.ui.profileScreen
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import com.example.naturewhispers.MainDispatcherRule
 import com.example.naturewhispers.data.auth.GoogleAuthHelper
+import com.example.naturewhispers.data.auth.GoogleAuthHelperFake
 import com.example.naturewhispers.data.auth.IAuthHelper
 import com.example.naturewhispers.data.firebase.FirestoreHelper
+import com.example.naturewhispers.data.firebase.FirestoreHelperFake
 import com.example.naturewhispers.data.firebase.IFirestoreHelper
 import com.example.naturewhispers.data.local.db.PresetDao
+import com.example.naturewhispers.data.local.db.PresetDaoFake
 import com.example.naturewhispers.data.local.db.StatDao
+import com.example.naturewhispers.data.local.db.StatDaoFake
 import com.example.naturewhispers.data.local.preferences.SettingsManager
 import com.example.naturewhispers.data.preferences.SettingsManagerFake
 import com.example.naturewhispers.presentation.redux.AppState
@@ -38,6 +44,10 @@ class ProfileViewModelTest {
     fun setUp() {
         store = Store(AppState())
         settingsManager = SettingsManagerFake()
+        firestoreHelper = FirestoreHelperFake()
+        presetDao = PresetDaoFake()
+        statDao = StatDaoFake()
+        googleAuthHelper = GoogleAuthHelperFake()
         viewModel = ProfileViewModel(settingsManager, store, firestoreHelper, presetDao, statDao, googleAuthHelper)
 
     }

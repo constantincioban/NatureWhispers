@@ -52,7 +52,9 @@ class MainViewModel @Inject constructor(
                 settingsManager.readStringSetting(SettingsManager.USERNAME).trim().ifEmpty { "Anonymous" }
 
             val dailyGoal =
-                settingsManager.readIntSetting(SettingsManager.DAILY_GOAL).toString().map { i -> if (i == '0') '1' else i }.joinToString("")
+                settingsManager.readIntSetting(SettingsManager.DAILY_GOAL).let {
+                    if (it == 0) 1 else it
+                }.toString()
 
             val profilePicUri =
                 settingsManager.readStringSetting(SettingsManager.PROFILE_PIC_URI)
