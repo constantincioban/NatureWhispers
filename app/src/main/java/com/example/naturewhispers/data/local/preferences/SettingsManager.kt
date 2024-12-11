@@ -9,6 +9,7 @@ interface SettingsManager {
         const val DARK_THEME = "dark_theme"
         const val USER_EMAIL = "user_email"
         const val AUTH_PREF = "auth_preference"
+        const val CURRENT_PRESET_ID = "current_preset_id"
     }
 
     enum class AuthPreference {

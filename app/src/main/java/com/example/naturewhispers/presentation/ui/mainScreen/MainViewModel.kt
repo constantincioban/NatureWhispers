@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.naturewhispers.data.di.TAG
@@ -34,6 +35,7 @@ class MainViewModel @Inject constructor(
     private val statDao: StatDao,
     private val settingsManager: SettingsManager,
     private val store: Store<AppState>,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
 
@@ -44,6 +46,7 @@ class MainViewModel @Inject constructor(
         private set
 
     private var startTimestamp: Long = 0
+    private var currentPresetId: Int = -1
 
 
     init {
@@ -61,6 +64,7 @@ class MainViewModel @Inject constructor(
 
             val darkThemeSetting =
                 settingsManager.readStringSetting(SettingsManager.DARK_THEME)
+            currentPresetId = settingsManager.readIntSetting("currentPresetId")
 
             state.value = state.value.copy(
                 username = username,
@@ -86,6 +90,8 @@ class MainViewModel @Inject constructor(
                     presetsFilteredByUser.reversed()
                 ))
                 store.update { appState -> appState.copy(presets = presetsFilteredByUser.reversed()) }
+                state.value = state.value.copy(currentPreset = presetsFilteredByUser.find { it.id == currentPresetId })
+
             }
         }
         viewModelScope.launch {
@@ -103,6 +109,7 @@ class MainViewModel @Inject constructor(
 
     private fun observeCurrentPreset() = viewModelScope.launch {
         snapshotFlow { state.value.currentPreset }.collectLatest {
+                settingsManager.saveIntSetting("currentPresetId", it?.id ?: -1)
                 state.value = state.value.copy(isBottomSheetShown = it != null)
         }
     }
