@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.naturewhispers.data.entities.Stat
+import com.example.naturewhispers.data.local.entities.Stat
 import com.example.naturewhispers.data.utils.formatDuration
 import com.example.naturewhispers.data.utils.formatDurationFromMillis
 import com.example.naturewhispers.data.utils.formatTime

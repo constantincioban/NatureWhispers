@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.naturewhispers.data.entities.Preset
+import com.example.naturewhispers.data.local.entities.Preset
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,20 +1,16 @@
 package com.example.naturewhispers.data.di
 
-import MediaPlayerImpl
 import android.app.Application
 import androidx.room.Room
 import com.example.naturewhispers.data.auth.GoogleAuthHelper
 import com.example.naturewhispers.data.auth.IAuthHelper
-import com.example.naturewhispers.data.entities.Preset
-import com.example.naturewhispers.data.firebase.FirestoreHelper
-import com.example.naturewhispers.data.firebase.IFirestoreHelper
+import com.example.naturewhispers.data.local.entities.Preset
+import com.example.naturewhispers.data.cloud.FirestoreHelper
+import com.example.naturewhispers.data.cloud.IFirestoreHelper
 import com.example.naturewhispers.data.local.db.NWDatabase
 import com.example.naturewhispers.data.local.db.PresetDao
-import com.example.naturewhispers.data.local.db.PresetDaoFake
 import com.example.naturewhispers.data.local.db.StatDao
 import com.example.naturewhispers.data.local.preferences.SettingsManager
-import com.example.naturewhispers.data.local.preferences.SettingsManagerImpl
-import com.example.naturewhispers.data.mediaPlayer.IMediaPlayer
 import com.example.naturewhispers.data.preferences.SettingsManagerFake
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.Store

@@ -99,20 +99,16 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Scaffold(
                         bottomBar = {
-                            println("current route = $currentRoute")
-                                when (currentRoute) {
-                                    Screens.Auth.route -> window.navigationBarColor = Color.Transparent.toArgb()
-                                    Screens.AddPreset.route -> window.navigationBarColor =
-                                        backgroundColor.toArgb()
-
-                                    else ->{
-                                        window.navigationBarColor = navigationBarColor.toArgb()
-                                        BottomBar(navigateTo = { route, _ ->
-                                            actions.navigateTo(route, listOf())
-                                        })
-
-                                    }
+                            when (currentRoute) {
+                                Screens.Auth.route -> window.navigationBarColor = Color.Transparent.toArgb()
+                                Screens.AddPreset.route -> window.navigationBarColor = backgroundColor.toArgb()
+                                else -> {
+                                    window.navigationBarColor = navigationBarColor.toArgb()
+                                    BottomBar(navigateTo = { route, _ ->
+                                        actions.navigateTo(route, listOf())
+                                    })
                                 }
+                            }
                         },
                         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
 
@@ -121,7 +117,6 @@ class MainActivity : ComponentActivity() {
                         Navigation(
                             navController = navController,
                             snackbarHostState = snackbarHostState,
-                            actions = actions,
                             playerManager = playerManager,
                             authPreferenceWasAsked = authPreferenceWasAsked,
                         )
@@ -162,17 +157,5 @@ class MainActivity : ComponentActivity() {
 
         }
     }
-
-    /*private fun launchLoginObserver(navController: NavHostController) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            store.state.collect { state ->
-                if (!state.isLoggedIn) {
-                    navController.navigate(Screens.Auth.route) {
-                        popUpTo(0) // reset stack
-                    }
-                }
-            }
-        }
-    }*/
 
 }

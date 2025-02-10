@@ -38,7 +38,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.example.naturewhispers.R
 import com.example.naturewhispers.data.di.TAG
-import com.example.naturewhispers.data.entities.Stat
+import com.example.naturewhispers.data.local.entities.Stat
 import com.example.naturewhispers.data.utils.ImmutableList
 import com.github.mikephil.charting.animation.ChartAnimator
 import com.github.mikephil.charting.charts.BarChart
@@ -121,7 +121,6 @@ fun BarChartComponent(
                     factory = { context ->
                         val chart = BarChart(context)
 
-                        // Chart setup moved here to reduce the lambda load
                         chart.apply {
                             setTouchEnabled(false)
                             isDragEnabled = false

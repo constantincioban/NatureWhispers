@@ -1,7 +1,4 @@
-package com.example.naturewhispers.data.firebase
-
-import com.example.naturewhispers.data.entities.Preset
-import com.example.naturewhispers.data.entities.Stat
+package com.example.naturewhispers.data.cloud
 
 class FirestoreHelperFake: IFirestoreHelper  {
 

@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.naturewhispers.data.di.TAG
-import com.example.naturewhispers.data.entities.Stat
+import com.example.naturewhispers.data.local.entities.Stat
 import com.example.naturewhispers.data.local.db.PresetDao
 import com.example.naturewhispers.data.local.db.StatDao
 import com.example.naturewhispers.data.utils.ImmutableList

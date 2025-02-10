@@ -4,12 +4,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.naturewhispers.data.auth.GoogleAuthHelper
 import com.example.naturewhispers.data.auth.IAuthHelper
-import com.example.naturewhispers.data.entities.Preset
-import com.example.naturewhispers.data.entities.Stat
-import com.example.naturewhispers.data.firebase.CollectionPath
-import com.example.naturewhispers.data.firebase.IFirestoreHelper
+import com.example.naturewhispers.data.local.entities.Preset
+import com.example.naturewhispers.data.local.entities.Stat
+import com.example.naturewhispers.data.cloud.CollectionPath
+import com.example.naturewhispers.data.cloud.IFirestoreHelper
 import com.example.naturewhispers.data.local.db.PresetDao
 import com.example.naturewhispers.data.local.db.StatDao
 import com.example.naturewhispers.data.local.preferences.SettingsManager
@@ -42,6 +41,7 @@ class ProfileViewModel @Inject constructor(
     var isLoggedOut = mutableStateOf(false)
         private set
 
+    private var messageIsActive = false
     private val _eventChannel = Channel<String>()
     val eventChannel = _eventChannel.receiveAsFlow()
 
@@ -65,7 +65,12 @@ class ProfileViewModel @Inject constructor(
 
 
     private fun sendUserEvent(toast: ProfileScreenMessages) = viewModelScope.launch {
+        if (!messageIsActive) {
             _eventChannel.send(toast.message)
+            messageIsActive = true
+            delay(3500)
+            messageIsActive = false
+        }
     }
 
     fun sendEvent(event: ProfileEvents) {

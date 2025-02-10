@@ -11,15 +11,12 @@ import androidx.media3.exoplayer.source.ClippingMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.local.models.Audio
-import com.example.naturewhispers.data.local.predefined.LocalData
+import com.example.naturewhispers.data.local.predefined.PredefinedData
 import com.example.naturewhispers.data.mediaPlayer.IMediaPlayer
 import com.example.naturewhispers.data.mediaPlayer.PlayerState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -99,7 +96,7 @@ class MediaPlayerImpl @Inject constructor(
     override fun prepare(audio: Audio) {
         Log.i(TAG, "[Player] Player is preparing...${audio}")
         try {
-            val localAudioList = LocalData.meditationSounds.map { it.key }
+            val localAudioList = PredefinedData.meditationSounds.map { it.key }
             val mediaItem = MediaItem.Builder()
                 .setUri(audio.uri.ifEmpty { localAudioList.find { it.title == audio.title }!!.uri })
                 .setMediaMetadata(

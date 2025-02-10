@@ -19,12 +19,10 @@ import com.example.naturewhispers.presentation.ui.profileScreen.ProfileScreen
 fun Navigation(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
-    actions: Actions,
     playerManager: PlayerManager,
     authPreferenceWasAsked: Boolean = false,
 ) {
     val actions = remember(navController) { Actions(navController) }
-//    val storeState = store.state.collectAsState()
     val startDestination =
         if (authPreferenceWasAsked)
             Screens.Main.route

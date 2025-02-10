@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.sp
 import com.example.naturewhispers.TestTags
 import com.example.naturewhispers.TestTags.BOTTOM_SHEET_PRESET
 import com.example.naturewhispers.data.di.TAG
-import com.example.naturewhispers.data.entities.Preset
+import com.example.naturewhispers.data.local.entities.Preset
 import com.example.naturewhispers.data.local.models.Audio
 import com.example.naturewhispers.data.mediaPlayer.PlayerEvents
 import com.example.naturewhispers.data.mediaPlayer.PlayerState
@@ -108,8 +108,11 @@ fun BottomSheetPreset(
             staticGradientBrush else solidColor
     }
 
+    LaunchedEffect(Unit) {
+        sendPlayerEventStable(PlayerEvents.OnPreparePlayer(preset.id))
+    }
+
     LaunchedEffect(playerState.currentPosition) {
-        Log.i(TAG, "BottomSheetPreset: ${preset.duration} == ${playerState.currentPosition.toInt()}")
         if (preset.duration == playerState.currentPosition.toInt()) {
             sendEvent(MainEvents.LogStat)
             sendPlayerEventStable(PlayerEvents.OnStopPlayer)

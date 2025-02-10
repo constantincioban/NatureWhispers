@@ -2,7 +2,7 @@ package com.example.naturewhispers.presentation.ui.mainScreen
 
 import app.cash.turbine.test
 import com.example.naturewhispers.MainDispatcherRule
-import com.example.naturewhispers.data.entities.Preset
+import com.example.naturewhispers.data.local.entities.Preset
 import com.example.naturewhispers.data.local.db.PresetDao
 import com.example.naturewhispers.data.local.db.PresetDaoFake
 import com.example.naturewhispers.data.local.db.StatDao

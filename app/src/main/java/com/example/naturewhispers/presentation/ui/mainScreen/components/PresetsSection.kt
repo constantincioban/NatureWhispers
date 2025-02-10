@@ -17,7 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.naturewhispers.data.entities.Preset
+import com.example.naturewhispers.data.local.entities.Preset
 import com.example.naturewhispers.data.utils.ImmutableList
 
 @Composable

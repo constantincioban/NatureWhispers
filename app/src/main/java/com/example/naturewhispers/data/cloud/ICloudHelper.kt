@@ -1,6 +1,4 @@
-package com.example.naturewhispers.data.firebase
-
-import kotlin.reflect.KClass
+package com.example.naturewhispers.data.cloud
 
 interface IFirestoreHelper {
 

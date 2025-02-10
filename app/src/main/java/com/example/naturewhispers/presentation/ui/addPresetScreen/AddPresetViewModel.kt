@@ -1,34 +1,39 @@
 package com.example.naturewhispers.presentation.ui.addPresetScreen
 
-import android.media.MediaMetadataRetriever
-import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import android.widget.Toast
 import androidx.compose.runtime.snapshotFlow
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.local.db.PresetDao
-import com.example.naturewhispers.data.entities.Preset
-import com.example.naturewhispers.data.local.predefined.LocalData
+import com.example.naturewhispers.data.local.entities.Preset
+import com.example.naturewhispers.data.local.predefined.PredefinedData
 import com.example.naturewhispers.navigation.Screens
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.ContentType
 import com.example.naturewhispers.presentation.redux.Store
-import com.example.naturewhispers.presentation.ui.mainScreen.MainEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,7 +47,9 @@ class AddPresetViewModel @Inject constructor(
     private var state = MutableStateFlow(AddPresetState())
     val uiState: StateFlow<AddPresetState> = state
 
-    private val _eventChannel = Channel<String>()
+
+    private var messageIsActive = false
+    private val _eventChannel = Channel<String>(0)
     val eventChannel = _eventChannel.receiveAsFlow()
 
     init {
@@ -67,7 +74,7 @@ class AddPresetViewModel @Inject constructor(
             snapshotFlow { state.value.chosenSound }
                 .distinctUntilChanged()
                 .collect { chosenSound ->
-                    if (LocalData.meditationSounds.map { it.key.title }.contains(chosenSound))
+                    if (PredefinedData.meditationSounds.map { it.key.title }.contains(chosenSound))
                         state.value = state.value.copy(maxDuration = 3600f)
                 }
         }
@@ -209,7 +216,12 @@ class AddPresetViewModel @Inject constructor(
     }
 
     private fun sendEvent(toast: ToastMessages) = viewModelScope.launch {
-        _eventChannel.send(toast.message)
+        if (!messageIsActive) {
+            _eventChannel.send(toast.message)
+            messageIsActive = true
+            delay(3500)
+            messageIsActive = false
+        }
     }
 
 

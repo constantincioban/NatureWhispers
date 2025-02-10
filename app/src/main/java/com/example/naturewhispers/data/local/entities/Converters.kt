@@ -1,4 +1,4 @@
-package com.example.naturewhispers.data.entities
+package com.example.naturewhispers.data.local.entities
 
 import androidx.room.TypeConverter
 import com.example.naturewhispers.data.utils.fromJson

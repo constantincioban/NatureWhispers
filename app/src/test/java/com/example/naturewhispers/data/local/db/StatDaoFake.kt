@@ -1,6 +1,6 @@
 package com.example.naturewhispers.data.local.db
 
-import com.example.naturewhispers.data.entities.Stat
+import com.example.naturewhispers.data.local.entities.Stat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

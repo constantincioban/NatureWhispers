@@ -2,7 +2,7 @@ package com.example.naturewhispers.presentation.ui.calendarScreen
 
 import app.cash.turbine.test
 import com.example.naturewhispers.MainDispatcherRule
-import com.example.naturewhispers.data.entities.Stat
+import com.example.naturewhispers.data.local.entities.Stat
 import com.example.naturewhispers.data.local.db.StatDao
 import com.example.naturewhispers.data.local.db.StatDaoFake
 import com.example.naturewhispers.presentation.redux.AppState

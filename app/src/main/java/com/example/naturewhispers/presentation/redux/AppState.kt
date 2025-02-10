@@ -1,6 +1,6 @@
 package com.example.naturewhispers.presentation.redux
 
-import com.example.naturewhispers.data.entities.Preset
+import com.example.naturewhispers.data.local.entities.Preset
 
 
 data class AppState(

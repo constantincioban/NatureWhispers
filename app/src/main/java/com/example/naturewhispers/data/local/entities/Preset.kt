@@ -1,4 +1,4 @@
-package com.example.naturewhispers.data.entities
+package com.example.naturewhispers.data.local.entities
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable

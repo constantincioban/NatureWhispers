@@ -1,6 +1,6 @@
-package com.example.naturewhispers.data.firebase
+package com.example.naturewhispers.data.cloud
 
-import com.example.naturewhispers.data.firebase.IFirestoreHelper.Response
+import com.example.naturewhispers.data.cloud.IFirestoreHelper.Response
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.gson.Gson

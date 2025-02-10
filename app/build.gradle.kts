@@ -124,7 +124,7 @@ dependencies {
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
 
-
+    // Google auth
     implementation("androidx.credentials:credentials:1.3.0-alpha02")
     implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")

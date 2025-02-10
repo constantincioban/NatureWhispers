@@ -1,14 +1,10 @@
 package com.example.naturewhispers.presentation.ui.profileScreen
 
-import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import com.example.naturewhispers.MainDispatcherRule
-import com.example.naturewhispers.data.auth.GoogleAuthHelper
 import com.example.naturewhispers.data.auth.GoogleAuthHelperFake
 import com.example.naturewhispers.data.auth.IAuthHelper
-import com.example.naturewhispers.data.firebase.FirestoreHelper
-import com.example.naturewhispers.data.firebase.FirestoreHelperFake
-import com.example.naturewhispers.data.firebase.IFirestoreHelper
+import com.example.naturewhispers.data.cloud.FirestoreHelperFake
+import com.example.naturewhispers.data.cloud.IFirestoreHelper
 import com.example.naturewhispers.data.local.db.PresetDao
 import com.example.naturewhispers.data.local.db.PresetDaoFake
 import com.example.naturewhispers.data.local.db.StatDao

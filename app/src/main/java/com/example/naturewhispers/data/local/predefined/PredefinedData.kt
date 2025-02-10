@@ -1,7 +1,6 @@
 package com.example.naturewhispers.data.local.predefined
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Forest
 import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.Water
@@ -9,7 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.naturewhispers.data.local.models.Audio
 
 
-object LocalData {
+object PredefinedData {
 
     val meditationSounds: Map<Audio, ImageVector> = mapOf(
         Pair(Audio(

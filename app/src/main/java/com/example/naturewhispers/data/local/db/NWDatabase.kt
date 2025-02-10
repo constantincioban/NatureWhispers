@@ -3,9 +3,9 @@ package com.example.naturewhispers.data.local.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.naturewhispers.data.entities.Converters
-import com.example.naturewhispers.data.entities.Preset
-import com.example.naturewhispers.data.entities.Stat
+import com.example.naturewhispers.data.local.entities.Converters
+import com.example.naturewhispers.data.local.entities.Preset
+import com.example.naturewhispers.data.local.entities.Stat
 
 @Database(entities = [ Preset::class, Stat::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)

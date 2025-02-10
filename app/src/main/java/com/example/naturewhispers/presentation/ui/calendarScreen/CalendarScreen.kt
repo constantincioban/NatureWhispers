@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.naturewhispers.data.di.TAG
-import com.example.naturewhispers.data.entities.Stat
+import com.example.naturewhispers.data.local.entities.Stat
 import com.example.naturewhispers.data.utils.ImmutableList
 import com.example.naturewhispers.data.utils.isSameDate
 import com.example.naturewhispers.presentation.ui.calendarScreen.components.StatCard

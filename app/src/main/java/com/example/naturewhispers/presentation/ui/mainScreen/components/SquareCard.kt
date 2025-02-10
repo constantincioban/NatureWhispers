@@ -19,9 +19,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.naturewhispers.TestTags
-import com.example.naturewhispers.data.entities.Preset
-import com.example.naturewhispers.data.local.predefined.LocalData
-import com.example.naturewhispers.data.utils.formatDuration
+import com.example.naturewhispers.data.local.entities.Preset
+import com.example.naturewhispers.data.local.predefined.PredefinedData
 import com.example.naturewhispers.data.utils.formatDurationFromMillis
 
 @Composable
@@ -30,9 +29,9 @@ fun SquareCard(
     item: Preset,
     onClick: (Int) -> Unit,
 
-) {
+    ) {
 
-    val imageVector = LocalData.meditationSounds
+    val imageVector = PredefinedData.meditationSounds
         .map { Pair(it.key.title, it.value) }.toMap()[item.sound] ?: Icons.Rounded.AutoAwesome
 
     Card(

@@ -125,6 +125,7 @@ fun Content(
 
 
     if (uiState.isBottomSheetShown && uiState.currentPreset != null) {
+
         BottomSheetPreset(
             preset = uiState.currentPreset,
             onDismiss = {
@@ -164,7 +165,6 @@ fun Content(
             presets = uiState.presets
         ) { id ->
             sendEventStable(MainEvents.OnPresetSelected(id))
-            sendPlayerEventStable(PlayerEvents.OnPreparePlayer(id))
         }
         Text(
             text = "Statistics",
