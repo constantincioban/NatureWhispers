@@ -61,13 +61,6 @@ fun MainScreen(
 
     val navigateToStable: (route: String, params: List<Any>) -> Unit = remember { navigateTo }
 
-    val isSystemInDarkTheme = isSystemInDarkTheme()
-    LaunchedEffect(viewModel.darkTheme) {
-        if (isSystemInDarkTheme && viewModel.darkTheme?.isEmpty() == true){
-            viewModel.sendEvent(MainEvents.OnUpdateTheme(true))
-        }
-    }
-
     Scaffold(
         modifier = Modifier
             .fillMaxSize()

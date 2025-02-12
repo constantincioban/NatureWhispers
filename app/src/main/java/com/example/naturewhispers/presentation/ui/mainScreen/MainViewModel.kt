@@ -1,13 +1,11 @@
 package com.example.naturewhispers.presentation.ui.mainScreen
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.naturewhispers.data.di.TAG
 import com.example.naturewhispers.data.local.entities.Preset
 import com.example.naturewhispers.data.local.db.PresetDao
 import com.example.naturewhispers.data.local.db.StatDao
@@ -19,7 +17,6 @@ import com.example.naturewhispers.data.utils.isSameDate
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.ContentType
 import com.example.naturewhispers.presentation.redux.Store
-import com.example.naturewhispers.presentation.ui.profileScreen.ProfileEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -39,8 +36,8 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private var state = mutableStateOf(MainState())
-    val uiState: State<MainState> = state
+    private var _uiState = mutableStateOf(MainState())
+    val uiState: State<MainState> = _uiState
 
     var darkTheme: String? = null
         private set
@@ -50,6 +47,7 @@ class MainViewModel @Inject constructor(
 
 
     init {
+        println("MainViewModel init")
         viewModelScope.launch {
             val username =
                 settingsManager.readStringSetting(SettingsManager.USERNAME).trim().ifEmpty { "Anonymous" }
@@ -67,7 +65,7 @@ class MainViewModel @Inject constructor(
 
             currentPresetId = settingsManager.readIntSetting("currentPresetId")
 
-            state.value = state.value.copy(
+            _uiState.value = _uiState.value.copy(
                 username = username,
                 dailyGoal = dailyGoal.toFloat(),
                 profilePicUri = profilePicUri,
@@ -83,22 +81,29 @@ class MainViewModel @Inject constructor(
                     darkTheme = darkThemeSetting
                 )
             }
+            store.state.collectLatest {
+                _uiState.value = _uiState.value.copy(
+                    username = it.username,
+                    dailyGoal = it.dailyGoal.toFloat(),
+                    profilePicUri = it.profilePicUri,
+                )
+            }
         }
         viewModelScope.launch {
             presetDao.getPresets().collectLatest {
                 val presetsFilteredByUser = it.filter { it.userId == store.state.value.userEmail }
-                state.value = state.value.copy(presets = ImmutableList(
+                _uiState.value = _uiState.value.copy(presets = ImmutableList(
                     presetsFilteredByUser.reversed()
                 ))
                 store.update { appState -> appState.copy(presets = presetsFilteredByUser.reversed()) }
-                state.value = state.value.copy(currentPreset = presetsFilteredByUser.find { it.id == currentPresetId })
+                _uiState.value = _uiState.value.copy(currentPreset = presetsFilteredByUser.find { it.id == currentPresetId })
 
             }
         }
         viewModelScope.launch {
             statDao.getStats().collectLatest {
                 val statsFilteredByUser = it.filter { it.userId == store.state.value.userEmail }
-                state.value = state.value.copy(
+                _uiState.value = _uiState.value.copy(
                     todaysTime = calculateTodaysTime(statsFilteredByUser),
                     streak = calculateStreak(statsFilteredByUser),
                     stats = ImmutableList(statsFilteredByUser)
@@ -109,9 +114,9 @@ class MainViewModel @Inject constructor(
     }
 
     private fun observeCurrentPreset() = viewModelScope.launch {
-        snapshotFlow { state.value.currentPreset }.collectLatest {
+        snapshotFlow { _uiState.value.currentPreset }.collectLatest {
                 settingsManager.saveIntSetting("currentPresetId", it?.id ?: -1)
-                state.value = state.value.copy(isBottomSheetShown = it != null)
+                _uiState.value = _uiState.value.copy(isBottomSheetShown = it != null)
         }
     }
 
@@ -124,14 +129,7 @@ class MainViewModel @Inject constructor(
             is MainEvents.OnUpdateContentType -> updateContentType(event.type)
             MainEvents.SetStartDuration -> setStartDuration()
             is MainEvents.OnPresetSelected -> updateCurrentPreset(event.id)
-            is MainEvents.OnUpdateTheme -> updateTheme(event.darkTheme)
         }
-    }
-
-
-    private fun updateTheme(darkTheme: Boolean) = viewModelScope.launch {
-        store.update { it.copy(darkTheme = darkTheme.toString()) }
-        settingsManager.saveStringSetting(SettingsManager.DARK_THEME, darkTheme.toString())
     }
 
     private fun calculateTodaysTime(stats: List<Stat>): Int {
@@ -159,7 +157,7 @@ class MainViewModel @Inject constructor(
     private fun logPreliminaryDuration() {
         if (startTimestamp == 0L) return
         val currentDuration = System.currentTimeMillis() - startTimestamp
-        state.value = state.value.copy(preliminaryDuration = state.value.preliminaryDuration + currentDuration)
+        _uiState.value = _uiState.value.copy(preliminaryDuration = _uiState.value.preliminaryDuration + currentDuration)
         startTimestamp = 0L
     }
 
@@ -169,29 +167,29 @@ class MainViewModel @Inject constructor(
     }
 
     private fun toggleIsLoading() {
-        state.value = state.value.copy(isLoading = !state.value.isLoading)
+        _uiState.value = _uiState.value.copy(isLoading = !_uiState.value.isLoading)
     }
 
     private suspend fun logStat() {
         logPreliminaryDuration()
-        if (TimeUnit.MILLISECONDS.toSeconds(state.value.preliminaryDuration) > 1L) {
+        if (TimeUnit.MILLISECONDS.toSeconds(_uiState.value.preliminaryDuration) > 1L) {
             statDao.upsertStat(
                 Stat(
-                    duration = state.value.preliminaryDuration,
+                    duration = _uiState.value.preliminaryDuration,
                     date = System.currentTimeMillis(),
-                    presetTitle = state.value.currentPreset?.title ?: "Unknown",
-                    presetId = state.value.currentPreset?.id ?: 0,
+                    presetTitle = _uiState.value.currentPreset?.title ?: "Unknown",
+                    presetId = _uiState.value.currentPreset?.id ?: 0,
                     userId = store.state.value.userEmail,
                     currentGoal = store.state.value.dailyGoal.ifEmpty { "1" }.toInt()
                 )
             )
         }
         startTimestamp = 0L
-        state.value = state.value.copy(preliminaryDuration = 0L)
+        _uiState.value = _uiState.value.copy(preliminaryDuration = 0L)
     }
 
     private fun updateCurrentPreset(id: Int) {
-        state.value = state.value.copy(currentPreset = state.value.presets.find { it.id == id })
+        _uiState.value = _uiState.value.copy(currentPreset = _uiState.value.presets.find { it.id == id })
     }
 
 }
@@ -220,6 +218,5 @@ sealed interface MainEvents {
     data class OnUpdateProfilePic(val uri: String) : MainEvents
     data class OnUpdateContentType(val type: ContentType) : MainEvents
     data class OnPresetSelected(val id: Int) : MainEvents
-    data class OnUpdateTheme(val darkTheme: Boolean): MainEvents
 
 }

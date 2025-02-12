@@ -32,14 +32,11 @@ import com.example.naturewhispers.data.mediaPlayer.PlayerManager
 import com.example.naturewhispers.navigation.Actions
 import com.example.naturewhispers.navigation.Navigation
 import com.example.naturewhispers.navigation.Screens
-import com.example.naturewhispers.presentation.components.NWCustomTheme
 import com.example.naturewhispers.presentation.redux.AppState
 import com.example.naturewhispers.presentation.redux.Store
 import com.example.naturewhispers.presentation.ui.bottomNavigation.BottomBar
+import com.example.naturewhispers.presentation.ui.theme.NatureWhispersTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -80,9 +77,9 @@ class MainActivity : ComponentActivity() {
         setContent {
 
 
-            val darkTheme = store.state.map { it.darkTheme }.collectAsState(initial = "")
-
-            NWCustomTheme(darkTheme = if (darkTheme.value.isEmpty()) isSystemInDarkTheme() else darkTheme.value.toBoolean()) {
+            val store = store.state.collectAsState()
+            val theme = if (store.value.darkTheme.isEmpty()) isSystemInDarkTheme() else store.value.darkTheme.toBoolean()
+            NatureWhispersTheme(darkTheme = theme) {
 
 
                 val navController = rememberNavController()
@@ -133,7 +130,6 @@ class MainActivity : ComponentActivity() {
         authPreferenceWasAsked = authPreference != AuthPreference.NONE
         if (authPreference == AuthPreference.USER) {
             store.update { it.copy(isLoggedIn = true, userEmail = email) }
-            println("userEmail = .$email.")
         }
     }
 

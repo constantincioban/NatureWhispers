@@ -59,7 +59,6 @@ class AddPresetViewModel @Inject constructor(
 
             viewModelScope.launch {
                 val preset = dao.getPresetById(presetId) ?: return@launch
-                Log.i(TAG, "[edit]: $preset")
                 state.value = state.value.copy(
                     presetId = presetId,
                     title = preset.title,
